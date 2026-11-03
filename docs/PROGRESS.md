@@ -27,3 +27,13 @@
 - Final Windows checks passed: type check, 7 behavior tests, build, core E2E (`test-results/e2e-1793685920946`) and recovery (`test-results/recovery-1793685920004`), including failed-connection preservation. Reviewed recovery screenshots and the final CJK-caption poster; source WebM hashes remain unchanged.
 - Published v0.1.1. Linux Node 22/24 core and recovery suites passed in CI run 41588060829; release E2E/showcase also passed. Fetched tag/commit `0255a145d15acd327e57734b65486e2d75c2a22c` and verified SHA-256/size for the public package, MP4 and GIF (`test-results/release-v0.1.1-receipt.json`).
 - Isolated production package installation reports CLI 0.1.1 and passes doctor. Current main follows the published repository; local branch `fix/workspace-recovery` preserves the Windows code/media commit. Recovery boundaries are documented in USAGE.md and VALIDATION-v0.1.1.md. Patch delivery complete.
+
+## UI revision — 2026-11-03
+
+- Fetched latest main and confirmed a clean starting point at `20aa7df9e4acdfb06ea8501f7cb76ff39f2a52d8`. Kept the prior code, architecture and user quality guidance.
+- Inspected Paper, ChatGPT, Gemini and Claude pages, plus Moonlitt's official product screenshots and Apple award results. Recorded observed methods, award categories and unavailable Play pages in UI-DESIGN.md; no third-party assets copied.
+- Chose a light canvas workspace over a dark timeline editor. Consolidated top actions, replaced step cards with action rows, moved editing to a Scene/Frame inspector, kept the source/final distinction and made sample captions literal.
+- Fixed help focus restoration and added UI checks for inspector switching and short desktop windows. Type checks, 7 behavior tests and build passed. Full core and recovery runs are in progress; do not yet treat this revision as released.
+- Visual review found native video controls covering captions. Added external playback/keyboard seek, explicit media preloading and actionable preview errors. Replaced hidden template radios with native controls and fixed narrow-screen grid overflow.
+- Final core E2E passed (`test-results/e2e-1793689409441`, 3/3 recordings, 0 retries, all templates, offline edit, playback/seek, 5 widths, focus return); recovery passed all 13 conditions (`test-results/recovery-1793689101242`). Reviewed actual Studio and mobile screenshots. Final showcase and GitHub publication remain next.
+- Produced and reviewed the 30.9 s, nine-step self-recorded showcase (`test-results/showcase-1793689509427`): two actual source takes, edited caption/frame retained, stable step IDs. Fully decoded MP4/GIF and inspected eight final frames. Preserving the Windows code/media on local branch `design/canvas-studio`; GitHub CI/release verification remains pending.

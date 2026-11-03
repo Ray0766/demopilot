@@ -62,6 +62,8 @@ The recorder uses Playwright's actionability waiting. It does not force-click, i
 
 ## Editing without replay
 
+In Studio, select a step or a scene thumbnail. **Scene** in the right inspector contains its caption, zoom, result hold and start/end trims. **Frame & export** contains the three templates and automatic wait trimming. The top toolbar records or exports; completed downloads remain below the inspector in either view. Narrow windows place the inspector below the preview.
+
 Each recording has an action fingerprint: URL, viewport and the ordered step IDs/actions/targets/values/result conditions. Those must match for rendering. Caption, zoom, trim, title, template, timeout and hold changes preserve identity. Changing a workflow requires **Record again**.
 
 Source clips include result waiting. Automatic trimming retains the action plus 350 ms, cuts the middle of a sufficiently long wait, and retains 250 ms before the result and its hold. Capture target preparation is always outside the clips and is recorded as `preWaitMs`. Automatic cut time is reported in `export.json` as `trimmedSeconds` (includes preparation); manual trims remain in the saved recipe. Labels disclose edited pacing; use source material for timing analysis.

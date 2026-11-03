@@ -31,7 +31,7 @@ The official Remotion screenshot and Screen Studio's live homepage demonstration
 
 Compared outline-driven and timeline-driven layouts. Chose outline-driven: a developer can change a selector or caption in the same step, without learning a video editor. Timeline supports selection; the final export is the exact preview. This costs a render to inspect a changed cut; no false real-time preview is shown.
 
-## Design tokens and review
+## Initial v0.1.0 design tokens and review
 
 - Colors: slate `#242b3a`, ink `#293348`, canvas `#f4f5f8`, white `#ffffff`, periwinkle `#4f63d8`, sage status `#88b5a8`.
 - Type: system Segoe UI Variable / Segoe UI, platform sans, Noto Sans and Microsoft YaHei fallback. 20–24 px identity/headlines, 12–14 px editing controls, secondary metadata at 10–11 px. No external font requests.
@@ -40,3 +40,7 @@ Compared outline-driven and timeline-driven layouts. Chose outline-driven: a dev
 - Motion: only recording progress and user-triggered video; reduced motion disables CSS transitions/spinners.
 
 Review against the brief removed a generic marketing hero and decorative gradients. The initial sample is an actual synthetic webpage, clearly labeled as a preview, not a pre-generated successful export.
+
+## v0.1.2 design revision
+
+The first UI still overused panel headlines, borders and promotional copy. The user's review prompted a canvas-led layout with a contextual scene inspector, literal sample captions and restrained action hierarchy. See [the reference analysis, alternatives, current tokens and boundaries](UI-DESIGN.md). This supersedes the initial layout/tokens above and keeps the capture/render/recovery architecture.

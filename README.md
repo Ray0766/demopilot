@@ -6,11 +6,11 @@
 
 ![A real browser workflow recorded and rendered by DemoPilot](docs/media/demo.gif)
 
-[Watch DemoPilot record and edit its own demo (22 s)](docs/media/showcase.mp4) · [Download the latest release](https://github.com/Ray0766/demopilot/releases/latest)
+[Watch DemoPilot record and edit its own demo](docs/media/showcase.mp4) · [Download the latest release](https://github.com/Ray0766/demopilot/releases/latest)
 
 **DemoPilot is a local recording and editing studio for developers shipping browser apps.** Give it a URL and explicit steps. It operates Chromium, records the real page, and turns the footage into a release video and a short README animation. Save the recipe alongside your code and record it again when the app changes.
 
-**v0.1.1:** a local recording and editing studio with draft recovery across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
+**v0.1.2:** a canvas-led Studio with scene editing beside the preview and draft recovery across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
 
 ## Try it
 
@@ -29,7 +29,7 @@ npm start
 Open **http://127.0.0.1:4310**. The included Littleboard sample uses synthetic data and needs no login:
 
 1. Click **Record demo**. Watch three steps run in a fresh browser.
-2. Select a scene. Change its caption, zoom, result hold or trims.
+2. Select a scene. Change its caption, zoom, result hold or trims in **Scene**. Choose a template in **Frame & export**.
 3. Click **Export MP4 + GIF**. Preview the actual export and download both files.
 
 Want to skip the editor? `npm run demo` starts its own sample server, records the workflow, and writes `output/demo/demo.mp4` and `output/demo/demo.gif`.
@@ -61,9 +61,9 @@ Start your app first, then change the website URL and steps. Give controls acces
   "url": "http://localhost:3000",
   "template": "studio",
   "steps": [
-    { "id": "open", "action": "click", "target": "role:button:New project", "caption": "Start with an idea." },
-    { "id": "name", "action": "fill", "target": "label:Project name", "value": "My next release", "caption": "Make it yours.", "zoom": 1.3 },
-    { "id": "save", "action": "click", "target": "testid:create-project", "waitFor": "text:My next release", "caption": "Ready for the first step." }
+    { "id": "open", "action": "click", "target": "role:button:New project", "caption": "Open the new project form." },
+    { "id": "name", "action": "fill", "target": "label:Project name", "value": "My next release", "caption": "Enter a project name.", "zoom": 1.3 },
+    { "id": "save", "action": "click", "target": "testid:create-project", "waitFor": "text:My next release", "caption": "Find the new project on the board." }
   ]
 }
 ```
@@ -89,7 +89,7 @@ For a GitHub README, copy the GIF into your repository and add:
 ![Product demo](docs/demo.gif)
 ```
 
-[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Validation](docs/VALIDATION.md) · [Design and technical decisions](docs/DECISIONS.md)
+[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Current validation](docs/VALIDATION-v0.1.2.md) · [UI references and design](docs/UI-DESIGN.md) · [Technical decisions](docs/DECISIONS.md)
 
 ## Boundaries of this release
 

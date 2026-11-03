@@ -1,11 +1,12 @@
 /** Produce a real DemoPilot-on-DemoPilot release demonstration. Run after npm run build. */
 import path from "node:path";
+import assert from "node:assert/strict";
 import { mkdir, copyFile, writeFile } from "node:fs/promises";
 import { createApp } from "../src/server/app.js";
 import { capture } from "../src/server/capture.js";
 import { render } from "../src/server/render.js";
 import { recipeSchema } from "../src/shared/schema.js";
-import { itemPath } from "../src/server/store.js";
+import { itemPath, listRecordings } from "../src/server/store.js";
 
 const root = path.resolve("test-results", `showcase-${Date.now()}`);
 const inner = await createApp({ root: path.join(root, "studio"), port: 4330 });
@@ -44,10 +45,17 @@ const recipe = recipeSchema.parse({
       id: "caption",
       action: "fill",
       target: "role:textbox:Caption for scene 1",
-      value: "Make room for your next release.",
-      caption: "Change the story without recording again.",
+      value: "Open a project form. 新建项目。",
+      caption: "Edit the caption while keeping the original footage.",
       holdMs: 2200,
       zoom: 1.2,
+    },
+    {
+      id: "frame-panel",
+      action: "click",
+      target: "role:button:Frame & export",
+      caption: "Frame settings stay separate from scene edits.",
+      holdMs: 1000,
     },
     {
       id: "style",
@@ -69,8 +77,23 @@ const recipe = recipeSchema.parse({
       action: "press",
       target: "video",
       value: "Space",
-      caption: "Save the recipe. Your next release already has a head start.",
+      caption: "Play the actual MP4. The captions stay readable.",
       holdMs: 4000,
+    },
+    {
+      id: "return-to-scene",
+      action: "click",
+      target: "role:button:Scene",
+      caption: "The edited caption stays attached to its step.",
+      holdMs: 1000,
+    },
+    {
+      id: "record-again",
+      action: "click",
+      target: "role:button:Record again",
+      waitFor: "text:Recording saved. Adjust the cut, then export your demo.",
+      caption: "Record again: fresh footage, the same edited recipe.",
+      holdMs: 3000,
     },
   ],
 });
@@ -78,6 +101,30 @@ const controller = new AbortController();
 process.once("SIGINT", () => controller.abort());
 try {
   const recording = await capture(recipe, root, controller.signal, console.log);
+  const takes = await listRecordings(path.join(root, "studio"));
+  assert.equal(takes.length, 2, "The showcase must finish two real recordings");
+  assert.deepEqual(
+    takes[0].scenes.map((scene) => scene.stepId),
+    takes[1].scenes.map((scene) => scene.stepId),
+  );
+  assert.equal(
+    takes[0].recipe.steps[0].caption,
+    "Open a project form. 新建项目。",
+  );
+  assert.equal(takes[0].recipe.template, "midnight");
+  await writeFile(
+    path.join(root, "repeatability.json"),
+    JSON.stringify(
+      {
+        recordingIds: takes.map((take) => take.id),
+        stableStepIds: true,
+        editedCaptionRetained: true,
+        selectedFrameRetained: true,
+      },
+      null,
+      2,
+    ),
+  );
   const result = await render(
     recording,
     recipe,

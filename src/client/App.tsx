@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import {
   ArrowDown,
   ArrowUp,
@@ -11,11 +11,10 @@ import {
   FolderOpen,
   Globe,
   LoaderCircle,
-  MousePointer2,
+  Pause,
   Play,
   Plus,
   RotateCcw,
-  Scissors,
   Settings2,
   Square,
   Trash2,
@@ -70,8 +69,12 @@ export function App() {
   const [notice, setNotice] = useState("");
   const [help, setHelp] = useState(false);
   const [settings, setSettings] = useState(false);
+  const [inspector, setInspector] = useState<"scene" | "frame">("scene");
   const [view, setView] = useState<"cut" | "source">("cut");
   const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [playbackError, setPlaybackError] = useState("");
   const [history, setHistory] = useState<Recipe[]>([]);
   const [opening, setOpening] = useState(true);
   const [storageWarning, setStorageWarning] = useState(false);
@@ -87,6 +90,38 @@ export function App() {
     ? JSON.stringify(output.recipe) !== JSON.stringify(recipe)
     : false;
   const scene = recording?.scenes.find((item) => item.stepId === step.id);
+  const previewAvailable = Boolean(
+    view === "cut" ? output : recording && scene,
+  );
+  const videoEvents = {
+    onLoadStart: () => {
+      setPlaying(false);
+      setTime(0);
+      setDuration(0);
+      setPlaybackError("");
+    },
+    onLoadedMetadata: (event: SyntheticEvent<HTMLVideoElement>) =>
+      setDuration(event.currentTarget.duration),
+    onTimeUpdate: (event: SyntheticEvent<HTMLVideoElement>) =>
+      setTime(event.currentTarget.currentTime),
+    onPlay: () => setPlaying(true),
+    onPause: () => setPlaying(false),
+    onEnded: () => setPlaying(false),
+    onError: () =>
+      setPlaybackError(
+        "Preview could not load. Reload Studio to retry, or download the export.",
+      ),
+  };
+  function togglePlayback() {
+    if (!video.current) return;
+    if (video.current.paused)
+      void video.current
+        .play()
+        .catch(() =>
+          setPlaybackError("Playback could not start. Reload Studio to retry."),
+        );
+    else video.current.pause();
+  }
 
   useEffect(() => {
     let active = true;
@@ -189,6 +224,7 @@ export function App() {
       }
     };
     document.addEventListener("keydown", handleKey);
+    document.querySelector<HTMLElement>(".help-modal button")?.focus();
     return () => {
       document.removeEventListener("keydown", handleKey);
       previous?.focus();
@@ -356,12 +392,29 @@ export function App() {
       <header className="app-header">
         <a className="wordmark" href="/" aria-label="DemoPilot home">
           <img src="/icon.svg" alt="" />
-          DemoPilot<span>Studio</span>
+          DemoPilot
         </a>
+        <div className="project-name">
+          {" "}
+          <input
+            aria-label="Demo title"
+            value={recipe.title}
+            maxLength={80}
+            disabled={busy}
+            onChange={(event) =>
+              change({ ...recipe, title: event.target.value })
+            }
+          />
+          <span className="saved-label">
+            {storageWarning
+              ? "Draft not saved · download recipe"
+              : "Local draft"}
+          </span>
+        </div>
         <div className="header-right">
           <span className="local-badge">
             <span />
-            Runs on your machine
+            Local studio
           </span>
           <button
             className="icon-button"
@@ -381,23 +434,6 @@ export function App() {
         </div>
       </header>
       <div className="project-bar">
-        <div className="project-name">
-          <Clapperboard size={21} />
-          <input
-            aria-label="Demo title"
-            value={recipe.title}
-            maxLength={80}
-            disabled={busy}
-            onChange={(event) =>
-              change({ ...recipe, title: event.target.value })
-            }
-          />
-          <span className="saved-label">
-            {storageWarning
-              ? "Draft not saved · download recipe"
-              : "Local draft"}
-          </span>
-        </div>
         <div className="project-actions">
           <button
             className="quiet"
@@ -421,14 +457,64 @@ export function App() {
               event.target.value = "";
             }}
           />
+          <div className="primary-actions">
+            {opening ? (
+              <button className="primary" disabled>
+                <LoaderCircle size={17} className="spin" />
+                Opening saved work…
+              </button>
+            ) : running ? (
+              <>
+                <button className="primary recording-button" disabled>
+                  <LoaderCircle size={17} className="spin" />
+                  {job.kind === "record" ? "Recording…" : "Rendering…"}
+                </button>
+                <button
+                  className="secondary"
+                  onClick={() => {
+                    void api(`/api/jobs/${job.id}/cancel`, {}).catch((cause) =>
+                      setError(cause.message),
+                    );
+                  }}
+                >
+                  <Square size={13} />
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className={matches ? "secondary" : "primary"}
+                  disabled={!token}
+                  onClick={() => void start("record")}
+                >
+                  <span className="record-dot" />
+                  {recording ? "Record again" : "Record demo"}
+                </button>
+                <button
+                  className={matches ? "primary export-button" : "secondary"}
+                  disabled={!matches || !token}
+                  onClick={() => void start("render")}
+                >
+                  <Download size={16} />
+                  {output ? "Update export" : "Export MP4 + GIF"}
+                </button>
+              </>
+            )}
+            {recording && !matches && (
+              <p className="mismatch">
+                The workflow changed. Record again to capture the updated steps.
+              </p>
+            )}
+          </div>
         </div>
       </div>
       <main className="workspace">
         <aside className="outline">
           <div className="section-heading">
             <div>
-              <h1>The story, step by step.</h1>
-              <p>A repeatable recipe for your next release.</p>
+              <h1>Recording recipe</h1>
+              <p>Run these steps again, keep your edits.</p>
             </div>
           </div>
           <label className="field url-field">
@@ -468,7 +554,10 @@ export function App() {
               <li key={item.id}>
                 <button
                   className={`step-item ${index === selected ? "selected" : ""} ${job?.stepId === item.id && busy ? "recording" : ""}`}
-                  onClick={() => setSelected(index)}
+                  onClick={() => {
+                    setSelected(index);
+                    setInspector("scene");
+                  }}
                   aria-current={index === selected ? "step" : undefined}
                 >
                   <span className="step-number">
@@ -479,13 +568,8 @@ export function App() {
                     )}
                   </span>
                   <span className="step-copy">
-                    <strong>
-                      {item.caption ||
-                        `${actionLabels[item.action]} ${item.target || item.value || "the page"}`}
-                    </strong>
+                    <strong>{actionLabels[item.action]}</strong>
                     <small>
-                      <MousePointer2 size={12} />
-                      {actionLabels[item.action]}{" "}
                       <span>{item.target || item.value || "page"}</span>
                     </small>
                   </span>
@@ -517,7 +601,7 @@ export function App() {
           </button>
           <div className="step-editor">
             <div className="editor-heading">
-              <strong>Step {selected + 1}</strong>
+              <strong>Step {selected + 1} action</strong>
               <div>
                 <button
                   className="icon-button"
@@ -623,8 +707,41 @@ export function App() {
               />
             </label>
           </div>
+          {recordings.length > 0 && (
+            <label className="field recordings-field">
+              <span>
+                <FolderOpen size={14} />
+                Previous recordings
+              </span>
+              <select
+                aria-label="Previous recordings"
+                disabled={busy}
+                value={recording?.id || ""}
+                onChange={(event) => {
+                  const item = recordings.find(
+                    (item) => item.id === event.target.value,
+                  );
+                  if (item) void openRecording(item);
+                }}
+              >
+                <option value="" disabled>
+                  Open a recording…
+                </option>
+                {recordings.map((item) => (
+                  <option value={item.id} key={item.id}>
+                    {item.recipe.title} ·{" "}
+                    {new Date(item.createdAt).toLocaleTimeString()}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <div className="outline-footer">
-            <button className="quiet" onClick={() => setSettings(!settings)}>
+            <button
+              className="quiet"
+              aria-expanded={settings}
+              onClick={() => setSettings(!settings)}
+            >
               <Settings2 size={16} />
               Recording settings
             </button>
@@ -685,12 +802,14 @@ export function App() {
           <div className="preview-heading">
             <div className="tabs">
               <button
+                aria-pressed={view === "cut"}
                 className={view === "cut" ? "active" : ""}
                 onClick={() => setView("cut")}
               >
                 Final cut
               </button>
               <button
+                aria-pressed={view === "source"}
                 className={view === "source" ? "active" : ""}
                 onClick={() => setView("source")}
               >
@@ -705,102 +824,134 @@ export function App() {
               30 fps
             </span>
           </div>
-          <div className={`preview-stage ${recipe.template}`}>
-            {view === "cut" && output ? (
-              <video
-                ref={video}
-                key={output.id}
-                src={output.mp4}
-                poster={output.poster}
-                controls
-                playsInline
-                onTimeUpdate={(event) =>
-                  setTime(event.currentTarget.currentTime)
-                }
-                aria-label="Final demo video"
-              />
-            ) : view === "source" && recording && scene ? (
-              <video
-                key={`${recording.id}-${scene.stepId}`}
-                src={`/media/recordings/${recording.id}/${scene.file}`}
-                poster={`/media/recordings/${recording.id}/${scene.poster}`}
-                controls
-                playsInline
-                aria-label="Recorded scene video"
-              />
-            ) : (
-              <div className="preview-empty">
-                {onSample ? (
-                  <div className="sample-window">
-                    <div className="window-chrome">
-                      <i />
-                      <i />
-                      <i />
-                      <span>littleboard · sample website</span>
+          <div className="preview-canvas">
+            <div className={`preview-stage ${recipe.template}`}>
+              {view === "cut" && output ? (
+                <video
+                  ref={video}
+                  key={output.id}
+                  src={output.mp4}
+                  poster={output.poster}
+                  preload="auto"
+                  playsInline
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === " " || event.key === "Enter") {
+                      event.preventDefault();
+                      togglePlayback();
+                    }
+                  }}
+                  {...videoEvents}
+                  aria-label="Final demo video"
+                />
+              ) : view === "source" && recording && scene ? (
+                <video
+                  ref={video}
+                  key={`${recording.id}-${scene.stepId}`}
+                  src={`/media/recordings/${recording.id}/${scene.file}`}
+                  poster={`/media/recordings/${recording.id}/${scene.poster}`}
+                  preload="auto"
+                  playsInline
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === " " || event.key === "Enter") {
+                      event.preventDefault();
+                      togglePlayback();
+                    }
+                  }}
+                  {...videoEvents}
+                  aria-label="Recorded scene video"
+                />
+              ) : (
+                <div className="preview-empty">
+                  {onSample ? (
+                    <div className="sample-window">
+                      <div className="window-chrome">
+                        <i />
+                        <i />
+                        <i />
+                        <span>littleboard · sample website</span>
+                      </div>
+                      <SamplePreview />
                     </div>
-                    <iframe
-                      src="/sample"
-                      title="Synthetic sample website preview"
-                      tabIndex={-1}
-                      sandbox="allow-scripts"
-                    />
-                    <div className="preview-overlay">
-                      <span>
-                        <Film size={16} />
-                        Your website. A story worth showing.
-                      </span>
+                  ) : (
+                    <div className="empty-custom">
+                      <Clapperboard size={44} />
+                      <h2>No footage yet</h2>
                       <p>
-                        Record the three sample steps to make your first demo.
+                        Check the website address and steps, then select Record
+                        demo.
                       </p>
                     </div>
-                  </div>
-                ) : (
-                  <div className="empty-custom">
-                    <Clapperboard size={44} />
-                    <h2>Your next release, in motion.</h2>
-                    <p>
-                      Add the steps you want to show.
-                      <br />
-                      Record them once, then make the cut your own.
-                    </p>
-                  </div>
-                )}
-                <span className="sample-label">
-                  {onSample
-                    ? "Live sample preview · not a recording"
-                    : "Your recording will appear here"}
-                </span>
-              </div>
-            )}
-            {view === "cut" && stale && (
-              <div className="stale-badge">
-                Edits pending. Export to update the final cut.
-              </div>
-            )}
+                  )}
+                  <span className="sample-label">
+                    {onSample
+                      ? "Live sample preview · not a recording"
+                      : "Your recording will appear here"}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
+          {view === "cut" && stale && (
+            <p className="stale-badge" role="status">
+              Edits pending. Export to update the final cut.
+            </p>
+          )}
           <div className="transport">
-            <span>
+            {previewAvailable && (
+              <>
+                <button
+                  className="icon-button playback-toggle"
+                  aria-label={playing ? "Pause preview" : "Play preview"}
+                  onClick={togglePlayback}
+                >
+                  {playing ? <Pause size={16} /> : <Play size={16} />}
+                </button>
+                <input
+                  type="range"
+                  className="seek"
+                  aria-label="Preview position"
+                  min="0"
+                  max={duration || 1}
+                  step="0.1"
+                  value={Math.min(time, duration || 1)}
+                  disabled={!duration}
+                  onChange={(event) => {
+                    const next = Number(event.target.value);
+                    if (video.current) video.current.currentTime = next;
+                    setTime(next);
+                  }}
+                />
+              </>
+            )}
+            <span className="preview-status">
               <span className={`status-dot ${recording ? "ready" : ""}`} />
               {output && view === "cut"
                 ? "Rendered video"
                 : recording && view === "source"
                   ? `Source · scene ${selected + 1}`
-                  : "Ready when you are"}
+                  : onSample
+                    ? "Record the sample to start"
+                    : "No recording yet"}
             </span>
             <span>
-              {output && view === "cut"
-                ? `${seconds(time)} / ${seconds(output.duration)}`
-                : scene && view === "source"
-                  ? seconds(scene.duration)
-                  : "No recording yet"}
+              {previewAvailable
+                ? `${seconds(time)} / ${seconds(duration || (view === "cut" ? output?.duration || 0 : scene?.duration || 0))}`
+                : "No recording yet"}
             </span>
           </div>
+          {playbackError && (
+            <p className="playback-error" role="alert">
+              {playbackError}
+            </p>
+          )}
           <div className="timeline-heading">
             <span>
               <Film size={15} />
-              Story strip
+              Scenes
             </span>
-            <span>{recipe.steps.length} scenes, one demo</span>
+            <span>{recipe.steps.length} in sequence</span>
           </div>
           <div className="timeline">
             {recipe.steps.map((item, index) => {
@@ -813,6 +964,7 @@ export function App() {
                   key={item.id}
                   onClick={() => {
                     setSelected(index);
+                    setInspector("scene");
                     if (recording) setView("source");
                   }}
                   aria-label={`Edit scene ${index + 1}`}
@@ -842,256 +994,222 @@ export function App() {
               );
             })}
           </div>
-          <section className="cut-editor" aria-label="Scene editing">
-            <div className="cut-heading">
-              <h2>
-                <Scissors size={17} />
-                Make the moment clear.
-              </h2>
-              <button
-                className="quiet"
-                disabled={!history.length || busy}
-                onClick={() => {
-                  const previous = history.at(-1);
-                  if (previous) {
-                    setRecipe(previous);
-                    setSelected(0);
-                    setHistory(history.slice(0, -1));
-                  }
-                }}
-              >
-                <RotateCcw size={14} />
-                Undo
-              </button>
-            </div>
-            <div className="cut-controls">
-              <label className="field caption-field">
-                <span>Caption for scene {selected + 1}</span>
-                <textarea
-                  value={step.caption}
-                  maxLength={160}
-                  rows={2}
-                  disabled={busy}
-                  placeholder="What should the viewer notice?"
-                  onChange={(event) =>
-                    patchStep({ caption: event.target.value })
-                  }
-                />
-              </label>
-              <label className="field">
-                <span>
-                  Focus zoom <b>{step.zoom.toFixed(1)}×</b>
-                </span>
-                <input
-                  type="range"
-                  min="1"
-                  max="1.8"
-                  step="0.1"
-                  value={step.zoom}
-                  disabled={busy}
-                  onChange={(event) =>
-                    patchStep({ zoom: Number(event.target.value) })
-                  }
-                />
-                <small>Follows the action target</small>
-              </label>
-              <label className="field">
-                <span>Hold the result</span>
-                <select
-                  value={step.holdMs}
-                  disabled={busy}
-                  onChange={(event) =>
-                    patchStep({ holdMs: Number(event.target.value) })
-                  }
-                >
-                  {[
-                    500, 1000, 1500, 1600, 1800, 2000, 2200, 2800, 3000, 4000,
-                    6000, 8000,
-                  ].map((ms) => (
-                    <option key={ms} value={ms}>
-                      {ms / 1000} seconds
-                    </option>
-                  ))}
-                  {![
-                    500, 1000, 1500, 1600, 1800, 2000, 2200, 2800, 3000, 4000,
-                    6000, 8000,
-                  ].includes(step.holdMs) && (
-                    <option value={step.holdMs}>
-                      {step.holdMs / 1000} seconds
-                    </option>
-                  )}
-                </select>
-              </label>
-            </div>
-            <div className="trim-controls">
-              <span>Trim scene</span>
-              <label>
-                Start{" "}
-                <input
-                  aria-label="Trim start seconds"
-                  type="number"
-                  min="0"
-                  max="60"
-                  step="0.1"
-                  disabled={busy}
-                  value={step.trimStart}
-                  onChange={(event) =>
-                    patchStep({ trimStart: Number(event.target.value) })
-                  }
-                />{" "}
-                s
-              </label>
-              <label>
-                End{" "}
-                <input
-                  aria-label="Trim end seconds"
-                  type="number"
-                  min="0"
-                  max="60"
-                  step="0.1"
-                  disabled={busy}
-                  value={step.trimEnd}
-                  onChange={(event) =>
-                    patchStep({ trimEnd: Number(event.target.value) })
-                  }
-                />{" "}
-                s
-              </label>
-              <span className="edit-note">
-                Edits preserve the original recording.
-              </span>
-            </div>
-          </section>
         </section>
-        <aside className="finish-panel">
-          <div className="section-heading">
-            <h2>The finishing touches.</h2>
-            <p>Frame the story. Keep the focus.</p>
+        <aside className="finish-panel" aria-label="Scene inspector">
+          <div
+            className="inspector-tabs"
+            role="group"
+            aria-label="Inspector view"
+          >
+            <button
+              aria-pressed={inspector === "scene"}
+              onClick={() => setInspector("scene")}
+            >
+              Scene
+            </button>
+            <button
+              aria-pressed={inspector === "frame"}
+              onClick={() => setInspector("frame")}
+            >
+              Frame & export
+            </button>
           </div>
-          <div className="primary-actions">
-            {opening ? (
-              <button className="primary" disabled>
-                <LoaderCircle size={17} className="spin" />
-                Opening saved work…
-              </button>
-            ) : running ? (
-              <>
-                <button className="primary recording-button" disabled>
-                  <LoaderCircle size={17} className="spin" />
-                  {job.kind === "record" ? "Recording…" : "Rendering…"}
-                </button>
+          {inspector === "scene" ? (
+            <section className="cut-editor" aria-label="Scene editing">
+              <div className="cut-heading">
+                <h2>Scene {selected + 1}</h2>
                 <button
-                  className="secondary"
+                  className="quiet"
+                  disabled={!history.length || busy}
                   onClick={() => {
-                    void api(`/api/jobs/${job.id}/cancel`, {}).catch((cause) =>
-                      setError(cause.message),
-                    );
+                    const previous = history.at(-1);
+                    if (previous) {
+                      setRecipe(previous);
+                      setSelected(0);
+                      setHistory(history.slice(0, -1));
+                    }
                   }}
                 >
-                  <Square size={13} />
-                  Cancel
+                  <RotateCcw size={14} />
+                  Undo
                 </button>
-              </>
-            ) : (
-              <>
-                <button
-                  className="primary"
-                  disabled={!token}
-                  onClick={() => void start("record")}
-                >
-                  <span className="record-dot" />
-                  {recording ? "Record again" : "Record demo"}
-                </button>
-                <button
-                  className={matches ? "export-button" : "secondary"}
-                  disabled={!matches || !token}
-                  onClick={() => void start("render")}
-                >
-                  <Download size={16} />
-                  {output ? "Update export" : "Export MP4 + GIF"}
-                </button>
-              </>
-            )}
-            {recording && !matches && (
-              <p className="mismatch">
-                The workflow changed. Record again to capture the updated steps.
-              </p>
-            )}
-          </div>
-          <fieldset className="templates" disabled={busy}>
-            <legend>Visual style</legend>
-            {(["studio", "paper", "midnight"] as const).map((name) => (
-              <label
-                className={`template-option ${recipe.template === name ? "selected" : ""}`}
-                key={name}
-              >
-                <input
-                  type="radio"
-                  name="template"
-                  value={name}
-                  checked={recipe.template === name}
-                  onChange={() => change({ ...recipe, template: name })}
-                />
-                <span className={`template-preview ${name}`}>
-                  <span />
-                  <i />
-                </span>
-                <span>
-                  <strong>
-                    {name.charAt(0).toUpperCase() + name.slice(1)}
-                  </strong>
-                  <small>
-                    {name === "studio"
-                      ? "A little room to shine"
-                      : name === "paper"
-                        ? "Quiet and considered"
-                        : "After-hours premiere"}
-                  </small>
-                </span>
-                {recipe.template === name && <Check size={15} />}
-              </label>
-            ))}
-          </fieldset>
-          <div className="pacing">
-            <label className="check-field">
-              <input
-                type="checkbox"
-                checked={recipe.trimWaiting}
-                disabled={busy}
-                onChange={(event) =>
-                  change({ ...recipe, trimWaiting: event.target.checked })
-                }
-              />
-              <span>Cut long result waits</span>
-            </label>
-            <p>
-              Keeps the action and its result. Edited pacing is labeled in the
-              video.
-            </p>
-          </div>
-          <div className="export-summary">
-            <h3>One demo. Two formats.</h3>
-            <div>
-              <Film size={18} />
-              <span>
-                <strong>Release video</strong>
-                <small>MP4 · 1280 × 900 · 30 fps</small>
-              </span>
-            </div>
-            <div>
-              <Clapperboard size={18} />
-              <span>
-                <strong>README animation</strong>
-                <small>GIF · 800 px · first 30 seconds</small>
-              </span>
-            </div>
-          </div>
-
+              </div>
+              <div className="cut-controls">
+                <label className="field caption-field">
+                  <span>Caption for scene {selected + 1}</span>
+                  <textarea
+                    value={step.caption}
+                    maxLength={160}
+                    rows={2}
+                    disabled={busy}
+                    placeholder="What should the viewer notice?"
+                    onChange={(event) =>
+                      patchStep({ caption: event.target.value })
+                    }
+                  />
+                </label>
+                <label className="field">
+                  <span>
+                    Focus zoom <b>{step.zoom.toFixed(1)}×</b>
+                  </span>
+                  <input
+                    type="range"
+                    min="1"
+                    max="1.8"
+                    step="0.1"
+                    value={step.zoom}
+                    disabled={busy}
+                    onChange={(event) =>
+                      patchStep({ zoom: Number(event.target.value) })
+                    }
+                  />
+                  <small>Follows the action target</small>
+                </label>
+                <label className="field">
+                  <span>Hold the result</span>
+                  <select
+                    value={step.holdMs}
+                    disabled={busy}
+                    onChange={(event) =>
+                      patchStep({ holdMs: Number(event.target.value) })
+                    }
+                  >
+                    {[
+                      500, 1000, 1500, 1600, 1800, 2000, 2200, 2800, 3000, 4000,
+                      6000, 8000,
+                    ].map((ms) => (
+                      <option key={ms} value={ms}>
+                        {ms / 1000} seconds
+                      </option>
+                    ))}
+                    {![
+                      500, 1000, 1500, 1600, 1800, 2000, 2200, 2800, 3000, 4000,
+                      6000, 8000,
+                    ].includes(step.holdMs) && (
+                      <option value={step.holdMs}>
+                        {step.holdMs / 1000} seconds
+                      </option>
+                    )}
+                  </select>
+                </label>
+              </div>
+              <div className="trim-controls">
+                <h3>Trim scene</h3>
+                <label>
+                  Start{" "}
+                  <input
+                    aria-label="Trim start seconds"
+                    type="number"
+                    min="0"
+                    max="60"
+                    step="0.1"
+                    disabled={busy}
+                    value={step.trimStart}
+                    onChange={(event) =>
+                      patchStep({ trimStart: Number(event.target.value) })
+                    }
+                  />{" "}
+                  s
+                </label>
+                <label>
+                  End{" "}
+                  <input
+                    aria-label="Trim end seconds"
+                    type="number"
+                    min="0"
+                    max="60"
+                    step="0.1"
+                    disabled={busy}
+                    value={step.trimEnd}
+                    onChange={(event) =>
+                      patchStep({ trimEnd: Number(event.target.value) })
+                    }
+                  />{" "}
+                  s
+                </label>
+              </div>
+            </section>
+          ) : (
+            <section
+              className="frame-editor"
+              aria-label="Frame and export settings"
+            >
+              {" "}
+              <fieldset className="templates" disabled={busy}>
+                <legend>Visual style</legend>
+                {(["studio", "paper", "midnight"] as const).map((name) => (
+                  <label
+                    className={`template-option ${recipe.template === name ? "selected" : ""}`}
+                    key={name}
+                  >
+                    <input
+                      type="radio"
+                      name="template"
+                      value={name}
+                      checked={recipe.template === name}
+                      onChange={() => change({ ...recipe, template: name })}
+                    />
+                    <span className={`template-preview ${name}`}>
+                      <span />
+                      <i />
+                    </span>
+                    <span>
+                      <strong>
+                        {name.charAt(0).toUpperCase() + name.slice(1)}
+                      </strong>
+                      <small>
+                        {name === "studio"
+                          ? "Soft blue frame"
+                          : name === "paper"
+                            ? "Light green frame"
+                            : "Dark blue frame"}
+                      </small>
+                    </span>
+                    {recipe.template === name && <Check size={15} />}
+                  </label>
+                ))}
+              </fieldset>
+              <div className="pacing">
+                <label className="check-field">
+                  <input
+                    type="checkbox"
+                    checked={recipe.trimWaiting}
+                    disabled={busy}
+                    onChange={(event) =>
+                      change({ ...recipe, trimWaiting: event.target.checked })
+                    }
+                  />
+                  <span>Cut long result waits</span>
+                </label>
+                <p>
+                  Keeps the action and its result. Edited pacing is labeled in
+                  the video.
+                </p>
+              </div>
+              <div className="export-summary">
+                <h3>Export formats</h3>
+                <div>
+                  <Film size={18} />
+                  <span>
+                    <strong>Release video</strong>
+                    <small>MP4 · 1280 × 900 · 30 fps</small>
+                  </span>
+                </div>
+                <div>
+                  <Clapperboard size={18} />
+                  <span>
+                    <strong>README animation</strong>
+                    <small>GIF · 800 px · first 30 seconds</small>
+                  </span>
+                </div>
+              </div>
+            </section>
+          )}
           {output && (
             <div className="downloads">
               <h3>
                 <Check size={15} />
-                Ready to share
+                {stale ? "Previous export" : "Export ready"}
               </h3>
               <a href={output.mp4} download="demo.mp4">
                 Download MP4 <span>{bytes(output.bytes.mp4)}</span>
@@ -1125,45 +1243,12 @@ export function App() {
               </small>
             </div>
           )}
-          {recordings.length > 0 && (
-            <label className="field recordings-field">
-              <span>
-                <FolderOpen size={14} />
-                Previous recordings
-              </span>
-              <select
-                aria-label="Previous recordings"
-                disabled={busy}
-                value={recording?.id || ""}
-                onChange={(event) => {
-                  const item = recordings.find(
-                    (item) => item.id === event.target.value,
-                  );
-                  if (item) void openRecording(item);
-                }}
-              >
-                <option value="" disabled>
-                  Open a recording…
-                </option>
-                {recordings.map((item) => (
-                  <option value={item.id} key={item.id}>
-                    {item.recipe.title} ·{" "}
-                    {new Date(item.createdAt).toLocaleTimeString()}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          <div className="local-note">
-            <span className="local-mark">
-              <Film size={16} />
-            </span>
-            <p>
-              No account. No upload.
-              <br />
-              Your footage stays yours.
-            </p>
-          </div>
+
+          <p className="inspector-note">
+            Edits preserve your source footage.
+            <br />
+            Export to preview the updated cut.
+          </p>
         </aside>
       </main>
       <footer className="status-bar" aria-live="polite">
@@ -1176,20 +1261,23 @@ export function App() {
           ) : (
             <>
               <Check size={14} />
-              {notice || "A good demo starts with a clear story."}
+              {notice ||
+                (recording
+                  ? "Source footage saved locally."
+                  : "Sample data is synthetic. Recording starts a fresh browser session.")}
             </>
           )}
         </span>
         {running ? (
           <progress value={job.progress} max="1" aria-label="Job progress" />
         ) : (
-          <span>DemoPilot 0.1 · Local studio</span>
+          <span>No account or upload</span>
         )}
       </footer>
       {error && (
         <div className="error-toast" role="alert">
           <div>
-            <strong>Something needs a quick fix.</strong>
+            <strong>Could not complete this action.</strong>
             <pre>{error}</pre>
           </div>
           <button
@@ -1213,12 +1301,11 @@ export function App() {
             <button
               className="icon-button close"
               aria-label="Close help"
-              autoFocus
               onClick={() => setHelp(false)}
             >
               <X />
             </button>
-            <h2>From workflow to final cut.</h2>
+            <h2>Record, edit, export</h2>
             <p>
               Start your website, write the steps, and record. Use the sample to
               try the whole process without an account.
@@ -1264,6 +1351,29 @@ export function App() {
           </section>
         </div>
       )}
+    </div>
+  );
+}
+
+function SamplePreview() {
+  const container = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0);
+  useEffect(() => {
+    const observer = new ResizeObserver(([entry]) =>
+      setScale(entry.contentRect.width / 1280),
+    );
+    if (container.current) observer.observe(container.current);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div className="sample-viewport" ref={container}>
+      <iframe
+        src="/sample"
+        title="Synthetic sample website preview"
+        tabIndex={-1}
+        sandbox="allow-scripts"
+        style={{ transform: `scale(${scale})` }}
+      />
     </div>
   );
 }

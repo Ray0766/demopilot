@@ -20,6 +20,8 @@ npm start
 
 打开 `http://127.0.0.1:4310`。默认提供虚构数据的 Littleboard 示例，点 **Record demo** 录制三步流程；修改字幕、缩放、停留或首尾裁剪，再点 **Export MP4 + GIF**。预览播放的是实际导出文件。
 
+v0.1.2 将成片预览放在工作台中央。左侧编辑动作与目标；选中场景后，在右侧 **Scene** 修改字幕和裁剪，在 **Frame & export** 选择模板与等待剪辑。窄窗口时检查器位于预览下方。[设计参考与取舍](UI-DESIGN.md)
+
 也可直接执行 `npm run demo`，自动启动示例并输出到 `output/demo/`。
 
 ## 核心用途：更新项目时重新拍摄
@@ -55,6 +57,6 @@ node dist/server/cli.js render <recording-id> demo.recipe.json --output output/r
 ![项目演示](docs/demo.gif)
 ```
 
-[完整配方与排错](USAGE.md) · [验证记录](VALIDATION.md) · [技术/设计决策](DECISIONS.md) · [贡献指南](../CONTRIBUTING.md)
+[完整配方与排错](USAGE.md) · [当前验证记录](VALIDATION-v0.1.2.md) · [技术/设计决策](DECISIONS.md) · [贡献指南](../CONTRIBUTING.md)
 
 源码采用 MIT。FFmpeg、浏览器与依赖保留各自许可。尚无与手工录屏或竞品的同任务耗时对照，不宣称生产效率提升百分比。

@@ -260,17 +260,30 @@ try {
       .getByRole("link", { name: /Download MP4/ })
       .waitFor({ timeout: 180000 });
     const video = page.getByLabel("Final demo video");
-    await video.evaluate(async (el: HTMLVideoElement) => {
-      el.muted = true;
-      await el.play();
-    });
+    await page
+      .getByRole("button", { name: "Play preview", exact: true })
+      .click();
     await pause(900);
     assert.ok(
       (await video.evaluate((el: HTMLVideoElement) => el.currentTime)) > 0,
     );
-    await video.evaluate((el: HTMLVideoElement) => {
-      el.pause();
+    await page
+      .getByRole("button", { name: "Pause preview", exact: true })
+      .click();
+    assert.equal(
+      await video.evaluate((el: HTMLVideoElement) => el.controls),
+      false,
+      "Playback controls must not cover the caption",
+    );
+    const seek = page.getByRole("slider", {
+      name: "Preview position",
+      exact: true,
     });
+    await seek.focus();
+    await page.keyboard.press("End");
+    await page.keyboard.press("ArrowLeft");
+    assert.ok(Number(await seek.inputValue()) > 1);
+    await page.keyboard.press("Home");
     await page.screenshot({
       path: path.join(root, "studio-export.png"),
       fullPage: true,
@@ -299,17 +312,80 @@ try {
       assert.equal(download.status, 200);
       assert.ok((await download.arrayBuffer()).byteLength > 1000);
     }
-    await page.waitForFunction(() => {
-      const video = document.querySelector("video");
-      return video && video.readyState >= 2;
+    await page
+      .waitForFunction(() => {
+        const video = document.querySelector("video");
+        return video && video.readyState >= 2;
+      })
+      .catch(async (cause) => {
+        await writeFile(
+          path.join(root, "playback-failure.json"),
+          JSON.stringify(
+            await page.locator("video").evaluate((el: HTMLVideoElement) => ({
+              src: el.currentSrc,
+              readyState: el.readyState,
+              networkState: el.networkState,
+              error: el.error && {
+                code: el.error.code,
+                message: el.error.message,
+              },
+            })),
+            null,
+            2,
+          ),
+        );
+        await page.screenshot({
+          path: path.join(root, "playback-failure.png"),
+          fullPage: true,
+        });
+        throw cause;
+      });
+    const frameButton = page.getByRole("button", {
+      name: "Frame & export",
+      exact: true,
     });
-    for (const width of [390, 768]) {
-      await page.setViewportSize({ width, height: 900 });
+    await frameButton.focus();
+    await page.keyboard.press("Enter");
+    await page.getByRole("radio", { name: /Midnight/ }).check();
+    await page.screenshot({
+      path: path.join(root, "studio-frame.png"),
+      fullPage: true,
+    });
+    await page.getByRole("radio", { name: /Studio/ }).check();
+    await page.getByRole("button", { name: "Scene", exact: true }).click();
+    assert.equal(
+      await page
+        .getByRole("textbox", { name: "Caption for scene 2", exact: true })
+        .inputValue(),
+      "The title changes, the original footage stays.",
+    );
+    const layouts = [
+      { width: 390, height: 900 },
+      { width: 768, height: 900 },
+      { width: 1280, height: 720 },
+      { width: 1366, height: 768 },
+    ];
+    for (const { width, height } of layouts) {
+      await page.setViewportSize({ width, height });
       assert.ok(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth + 1,
         ),
+        `Horizontal overflow at ${width} × ${height}`,
       );
+      if (width >= 1200) {
+        const stage = await page.locator(".preview-stage").boundingBox();
+        const scene = await page
+          .getByRole("button", { name: "Edit scene 1", exact: true })
+          .boundingBox();
+        assert.ok(
+          stage && stage.height > 220 && stage.y + stage.height < height,
+        );
+        assert.ok(
+          scene && scene.y + scene.height < height,
+          "The scene strip must fit without page scrolling",
+        );
+      }
       await page.screenshot({
         path: path.join(root, `studio-${width}.png`),
         fullPage: true,
@@ -319,15 +395,37 @@ try {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.getByRole("button", { name: "Open help", exact: true }).click();
     await page.getByRole("dialog").waitFor();
+    assert.equal(
+      await page.evaluate(() =>
+        document.activeElement?.getAttribute("aria-label"),
+      ),
+      "Close help",
+    );
+    await page.keyboard.press("Shift+Tab");
+    assert.equal(
+      await page.evaluate(() => document.activeElement?.textContent?.trim()),
+      "Got it",
+    );
     await page.screenshot({ path: path.join(root, "studio-help.png") });
     await page.getByRole("button", { name: "Got it", exact: true }).click();
+    assert.equal(
+      await page.evaluate(() =>
+        document.activeElement?.getAttribute("aria-label"),
+      ),
+      "Open help",
+    );
     assert.deepEqual(errors, []);
     results.ui = {
       recordEditExport: true,
       videoPlayback: true,
       downloads: true,
       offlineEditNoRecapture: true,
-      responsiveWidths: [390, 768, 1600],
+      responsiveWidths: [390, 768, 1280, 1366, 1600],
+      frameInspectorPreservesEdits: true,
+      desktopPreviewAndScenesFit: true,
+      helpKeyboardFocus: true,
+      externalPlaybackControls: true,
+      keyboardSeek: true,
       pageErrors: errors,
     };
     const publicDir = path.resolve("docs", "media");

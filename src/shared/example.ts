@@ -3,7 +3,7 @@ import { recipeSchema, type Recipe } from "./schema.js";
 export function exampleRecipe(origin = "http://127.0.0.1:4310"): Recipe {
   return recipeSchema.parse({
     version: 1,
-    title: "A little less busywork",
+    title: "Create a project in Littleboard",
     url: `${origin}/sample`,
     template: "studio",
     steps: [
@@ -11,7 +11,7 @@ export function exampleRecipe(origin = "http://127.0.0.1:4310"): Recipe {
         id: "create",
         action: "click",
         target: "role:button:New project",
-        caption: "Make room for your next idea.",
+        caption: "Open the new project form.",
         holdMs: 2200,
         zoom: 1,
       },
@@ -20,7 +20,7 @@ export function exampleRecipe(origin = "http://127.0.0.1:4310"): Recipe {
         action: "fill",
         target: "label:Project name",
         value: "Launch a little sooner",
-        caption: "Give it a name worth shipping.",
+        caption: "Enter a project name.",
         holdMs: 1600,
         zoom: 1.3,
       },
@@ -29,7 +29,7 @@ export function exampleRecipe(origin = "http://127.0.0.1:4310"): Recipe {
         action: "click",
         target: "role:button:Create project",
         waitFor: "text:Launch a little sooner",
-        caption: "One place to move your work forward.",
+        caption: "Create the project and find it on the board.",
         holdMs: 2800,
         zoom: 1,
       },
