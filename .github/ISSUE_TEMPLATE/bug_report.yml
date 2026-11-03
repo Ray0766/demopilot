@@ -1,0 +1,22 @@
+name: Bug report
+description: A recording, editing or export problem with a synthetic reproduction.
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include the failed step ID or error message.
+    validations:
+      required: true
+  - type: textarea
+    id: recipe
+    attributes:
+      label: Minimal synthetic recipe and app
+      description: Remove credentials, personal data and private URLs. Link a small reproduction if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node.js, Chromium, FFmpeg and DemoPilot version; include doctor output without private paths.

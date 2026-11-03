@@ -1,0 +1,87 @@
+{
+  "machine": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.18.0",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285K"
+  },
+  "startedAt": "2026-11-03T02:43:39.521Z",
+  "repeatability": {
+    "successes": 3,
+    "retries": 0,
+    "ids": [
+      "a1496ce3-bfa4-41f8-9103-0713f04151f5",
+      "0db11411-538d-4671-9063-1a503195de73",
+      "39a74f1d-c93a-418c-b4e7-85e1962924ce"
+    ],
+    "elapsedMs": [
+      11439,
+      11342,
+      11294
+    ],
+    "changedAppSameRecipe": true
+  },
+  "slow": {
+    "waitSeconds": 2.868031900000002
+  },
+  "failureHandling": {
+    "missingTarget": "failed with step ID",
+    "captureCancellation": "no partial recording"
+  },
+  "editing": {
+    "offlineRerender": true,
+    "sourceUnchanged": true,
+    "actionMismatchRejected": true,
+    "renderCancellation": "no partial export",
+    "templates": [
+      "studio",
+      "paper",
+      "midnight"
+    ]
+  },
+  "exports": [
+    {
+      "id": "9f22aa5e-aa8d-4d06-a233-3e28454dd304",
+      "template": "studio",
+      "duration": 11.033333,
+      "trimmedSeconds": 0.09,
+      "bytes": {
+        "mp4": 276962,
+        "gif": 1568180
+      }
+    },
+    {
+      "id": "2fa7f5b5-3b0f-45e9-a6d8-b506b21d46d1",
+      "template": "paper",
+      "duration": 11.1,
+      "trimmedSeconds": 0.09,
+      "bytes": {
+        "mp4": 288450,
+        "gif": 1650342
+      }
+    },
+    {
+      "id": "3a3babbd-d9dc-4ee9-a89f-4b73444a2cbd",
+      "template": "midnight",
+      "duration": 10.733333,
+      "trimmedSeconds": 2.37,
+      "bytes": {
+        "mp4": 281470,
+        "gif": 1651523
+      }
+    }
+  ],
+  "ui": {
+    "recordEditExport": true,
+    "videoPlayback": true,
+    "downloads": true,
+    "offlineEditNoRecapture": true,
+    "responsiveWidths": [
+      390,
+      768,
+      1600
+    ],
+    "pageErrors": []
+  },
+  "totalSeconds": 88.3102521
+}

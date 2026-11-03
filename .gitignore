@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.demopilot/
+output/
+test-results/
+*.tgz
+.env*
+!.env.example
+*.log
+.DS_Store

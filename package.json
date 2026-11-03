@@ -1,0 +1,60 @@
+{
+  "name": "@ray0766/demopilot",
+  "version": "0.1.0",
+  "description": "Repeatable browser workflows. Release-ready demo videos.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Ray0766",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ray0766/demopilot.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "demopilot": "dist/server/cli.js"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "docs/USAGE.md",
+    "docs/README.zh-CN.md",
+    "public/icon.svg"
+  ],
+  "scripts": {
+    "dev": "tsx src/server/cli.ts studio --dev",
+    "build": "tsc -p tsconfig.server.json && vite build",
+    "start": "node dist/server/cli.js studio",
+    "check": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:e2e": "tsx tests/e2e.ts",
+    "demo": "node dist/server/cli.js demo",
+    "doctor": "tsx src/server/cli.ts doctor",
+    "prepack": "npm run build",
+    "showcase": "tsx scripts/showcase.ts"
+  },
+  "dependencies": {
+    "commander": "14.0.3",
+    "express": "5.3.0",
+    "playwright": "1.64.1",
+    "sharp": "0.35.5",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "lucide-react": "0.577.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vite": "8.3.5"
+  }
+}

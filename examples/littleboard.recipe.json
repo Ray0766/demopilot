@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "title": "A little less busywork",
+  "url": "http://127.0.0.1:4310/sample",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "template": "studio",
+  "trimWaiting": true,
+  "timeoutMs": 15000,
+  "steps": [
+    {
+      "id": "create",
+      "action": "click",
+      "target": "role:button:New project",
+      "value": "",
+      "caption": "Make room for your next idea.",
+      "waitFor": "",
+      "holdMs": 2200,
+      "zoom": 1,
+      "trimStart": 0,
+      "trimEnd": 0
+    },
+    {
+      "id": "name",
+      "action": "fill",
+      "target": "label:Project name",
+      "value": "Launch a little sooner",
+      "caption": "Give it a name worth shipping.",
+      "waitFor": "",
+      "holdMs": 1600,
+      "zoom": 1.3,
+      "trimStart": 0,
+      "trimEnd": 0
+    },
+    {
+      "id": "save",
+      "action": "click",
+      "target": "role:button:Create project",
+      "value": "",
+      "caption": "One place to move your work forward.",
+      "waitFor": "text:Launch a little sooner",
+      "holdMs": 2800,
+      "zoom": 1,
+      "trimStart": 0,
+      "trimEnd": 0
+    }
+  ]
+}
