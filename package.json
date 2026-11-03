@@ -1,6 +1,6 @@
 {
   "name": "@ray0766/demopilot",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Repeatable browser workflows. Release-ready demo videos.",
   "type": "module",
   "license": "MIT",
@@ -23,7 +23,9 @@
     "THIRD_PARTY_NOTICES.md",
     "docs/USAGE.md",
     "docs/README.zh-CN.md",
-    "public/icon.svg"
+    "public/icon.svg",
+    "public/fonts/SOURCES.json",
+    "public/fonts/*.txt"
   ],
   "scripts": {
     "dev": "tsx src/server/cli.ts studio --dev",

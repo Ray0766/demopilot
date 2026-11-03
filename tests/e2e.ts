@@ -235,11 +235,31 @@ try {
       viewport: { width: 1600, height: 1120 },
     });
     const errors: string[] = [];
+    const remoteRequests: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
+    page.on("request", (request) => {
+      if (!request.url().startsWith(origin) && /^https?:/.test(request.url())) {
+        remoteRequests.push(request.url());
+      }
+    });
     await page.goto(origin);
     await page
       .getByRole("button", { name: "Record demo", exact: true })
       .waitFor();
+    await page.evaluate(() => document.fonts.ready);
+    assert.ok(
+      await page.evaluate(
+        () =>
+          document.fonts.check("550 32px Bricolage") &&
+          document.fonts.check('400 14px "DM Sans"'),
+      ),
+      "The locally bundled display and reading fonts must load",
+    );
+    assert.deepEqual(
+      remoteRequests,
+      [],
+      "The built-in workbench must not fetch external design assets",
+    );
     await page.screenshot({
       path: path.join(root, "studio-empty.png"),
       fullPage: true,
@@ -409,6 +429,23 @@ try {
         path: path.join(root, `studio-${width}.png`),
         fullPage: true,
       });
+      if (width === 390) {
+        const title = page.getByRole("textbox", {
+          name: "Demo title",
+          exact: true,
+        });
+        const originalTitle = await title.inputValue();
+        await title.fill(
+          "演示配方可以随项目更新再次录制，同时保留字幕、缩放与剪辑。长中文项目名称应完整显示，并且不遮挡录制、导出和场景选择按钮。",
+        );
+        assert.ok(
+          await title.evaluate(
+            (el: HTMLTextAreaElement) => el.scrollHeight <= el.clientHeight + 1,
+          ),
+          "Narrow-screen project titles must grow without clipping",
+        );
+        await title.fill(originalTitle);
+      }
     }
     await page.setViewportSize({ width: 1600, height: 1120 });
     const captionTwo = page.getByRole("textbox", {
@@ -466,6 +503,9 @@ try {
       keyboardSeek: true,
       keyboardDisclosures: true,
       inlineCaptionExpansion: true,
+      narrowTitleExpansion: true,
+      bundledFontsLoaded: true,
+      noExternalDesignRequests: true,
       pageErrors: errors,
     };
     const publicDir = path.resolve("docs", "media");

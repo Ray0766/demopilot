@@ -10,7 +10,7 @@
 
 **DemoPilot is a local recording and editing studio for developers shipping browser apps.** Give it a URL and explicit steps. It operates Chromium, records the real page, and turns the footage into a release video and a short README animation. Save the recipe alongside your code and record it again when the app changes.
 
-**v0.1.3:** an editable script beside the footage, with action and timing controls that unfold in place. Drafts recover across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
+**v0.1.4:** a bright release workbench with a project masthead, contextual scene editing and a horizontal sequence. Drafts recover across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
 
 ## Try it
 
@@ -89,7 +89,7 @@ For a GitHub README, copy the GIF into your repository and add:
 ![Product demo](docs/demo.gif)
 ```
 
-[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Current validation](docs/VALIDATION-v0.1.3.md) · [UI references and design](docs/UI-ART-DIRECTION.md) · [Technical decisions](docs/DECISIONS.md)
+[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Current validation](docs/VALIDATION-v0.1.4.md) · [UI references and design](docs/UI-COMPOSITION.md) · [Technical decisions](docs/DECISIONS.md)
 
 ## Boundaries of this release
 

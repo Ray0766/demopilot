@@ -48,3 +48,7 @@ The first UI still overused panel headlines, borders and promotional copy. The u
 ## v0.1.3 art direction
 
 The user also rejected v0.1.2's boxed property-editor composition. [Script and screening room](UI-ART-DIRECTION.md) supersedes that layout: inline captions, contextual native disclosures and a single footage area. The document records actual Things/Craft page observations, two alternatives, tokens, technical reasons and limits. The backend and pinned dependencies are retained. No improvement in task time or user preference is claimed.
+
+## v0.1.4 composition and typography
+
+The user explicitly chose a bright branded workbench after rejecting the previous composition and type hierarchy. [Release workbench](UI-COMPOSITION.md) records the two alternatives, actual Framer/Frame.io/Tella observations, asymmetric scene/footage layout and horizontal sequence. Bricolage Grotesque and DM Sans are self-hosted OFL assets (Fontsource variable packages 5.3.0; exact hashes and licenses in public/fonts). Their 194,272 bytes buy consistent Latin typography across machines; system CJK and renderer fonts remain unchanged. Existing capture, recovery and rendering architecture is retained. Preference and productivity gains remain unverified.

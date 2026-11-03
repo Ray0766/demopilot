@@ -51,3 +51,12 @@
 - Prepared v0.1.3 and its release/validation notes. No dependency or backend change. Preserving the local code/media on `design/script-studio` before GitHub publication.
 - Published v0.1.3 after Linux Node 22/24 core/recovery and release checks passed (run 41608621926). Fetched tag `4dd5ff2d371ceb764a026d36fb766c2ca06f749b`; public package, MP4 and GIF match published sizes/SHA-256 (`test-results/release-v0.1.3-receipt.json`). Reviewed the actual Linux screenshot and decoded the public MP4. The downloaded release package installs and reports CLI 0.1.3 / doctor ready.
 - Main follows the published repository; local branch `design/script-studio` preserves the Windows implementation/media commit `83b3e37`. Implementation, verification and publication are complete. User aesthetic preference, full accessibility and broad browser behavior remain unverified as documented.
+
+## Bright workbench revision — 2026-11-03
+
+- Fetched latest main at `b51450cebf50ac6933fdd56445aa5acb26fe114a`, preserving the clean existing implementation. User rejected the previous composition and explicitly chose large type, bright color and asymmetry.
+- Read the frontend-design skill and inspected real Framer, Frame.io and Tella pages. Recorded two compositions, tokens and reference boundaries in UI-COMPOSITION.md before implementation.
+- Rebuilt the project masthead, contextual scene editor and horizontal sequence; introduced locally bundled OFL Bricolage Grotesque and DM Sans (194,272 bytes, verified archive integrity, license/provenance files). Kept capture/render/recovery protocols unchanged. Source playback now fits the actual captured viewport ratio.
+- First actual browser review and recording/export completed in isolated `test-results/brand-studio`. Type check passed. Responsive, recovery and final media validation are next; this entry does not claim release completion or user design approval.
+- Final Windows core run passes (`test-results/e2e-1793699427207`, 3/3 recordings with zero retries, unchanged source hashes, five widths, fonts, keyboard and bilingual text); recovery passes all 13 conditions (`test-results/recovery-1793699129382`). Fixed narrow Chinese-title clipping and improved secondary text contrast after visual review.
+- Reviewed the 30.967 s real showcase (`test-results/showcase-1793699226333`), with two takes and retained caption/template. MP4/GIF fully decode. The 343 KB package installs in isolation and reports CLI 0.1.4 / doctor ready. Preserving source and Windows evidence on `design/bright-workbench`; GitHub publication is next.
