@@ -32,10 +32,14 @@ The Windows showcase is 30.9 s (MP4 811,992 bytes; GIF 3,963,029 bytes). `test-r
 
 ## Release verification
 
-Local validation is complete. GitHub Node 22/24 CI, the release build and published asset verification are pending until the release receipt is recorded here.
+[GitHub Actions run 41594494552](https://github.com/Ray0766/demopilot/actions/runs/41594494552) passed on Linux with Node 22 and 24, including core E2E and recovery. The release job also passed its own core flow, two-take showcase and package build.
+
+[v0.1.2](https://github.com/Ray0766/demopilot/releases/tag/v0.1.2) is public. The fetched tag resolves to `860584090a2a770f1094d876fb1cc6840e8209f8`. All three public downloads match their published SHA-256 digests: package 145,165 bytes, showcase MP4 814,651 bytes (30.967 s), sample GIF 1,624,213 bytes. The fetched repository media also matches the release asset hashes. Local receipt: `test-results/release-v0.1.2-receipt.json`.
+
+The Windows package was installed with production dependencies into `test-results/package-smoke-v012`. The installed CLI reports `0.1.2`; doctor detects Chromium 156.0.8078.4, FFmpeg/ffprobe 8.1 and reports “Ready to record.” This check reuses existing system/browser dependencies. This is a GitHub release package, not an npm registry publication.
 
 ## Limits
 
 No comparative usability study has established that the revised UI is faster or preferred. This is not a full WCAG 2.2 audit; screen-reader coverage, true browser 200% zoom and Firefox/Safari behavior remain unverified. Small windows intentionally scroll and stack controls. At short desktop heights, the preview is smaller and inspector/download sections may scroll.
 
-The template preview is not a real-time render. Pending edits remain labeled; export is required to see them in the final video. The older [capture limits](VALIDATION.md#limits-still-unverified) and [draft recovery boundaries](VALIDATION-v0.1.1.md#limits) continue to apply. No audio, desktop automation, login reuse or natural-language planning was added.
+The template preview is not a real-time render. Pending edits remain labeled; export is required to see them in the final video. The older [capture limits](VALIDATION.md#limits-still-unverified) and [draft recovery boundaries](VALIDATION-v0.1.1.md#boundaries) continue to apply. No audio, desktop automation, login reuse or natural-language planning was added.
