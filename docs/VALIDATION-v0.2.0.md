@@ -1,6 +1,6 @@
 # v0.2.0 validation
 
-Validated on 2026-11-03, Windows x64, Intel Core Ultra 9 285K, Node 24.18.0, Playwright 1.64.1 / Chromium 156.0.8078.4 and FFmpeg 8.1. GitHub Linux verification and publication are pending; the Windows results below are measured, not projected.
+Validated on 2026-11-03, Windows x64, Intel Core Ultra 9 285K, Node 24.18.0, Playwright 1.64.1 / Chromium 156.0.8078.4 and FFmpeg 8.1. Linux Node 22/24 verification and release CI also passed. The detailed performance measurements below are from Windows, not projected Linux results.
 
 ## Reproducible checks
 
@@ -20,6 +20,13 @@ Validated on 2026-11-03, Windows x64, Intel Core Ultra 9 285K, Node 24.18.0, Pla
 A portable numeric receipt is committed at [evidence/editable-composition-v0.2.0.json](evidence/editable-composition-v0.2.0.json). Raw Windows screenshots, source takes and detailed logs remain under the ignored `test-results/` paths above. Public demo media is regenerated and checked by Linux release CI, so its bytes and timings can differ from the Windows receipt.
 
 The synthetic workflow and targeted failure cases validate retained edits, caption completeness, scene preview/export agreement, content-addressed caching and recorded-result camera motion. They do not establish reliability across arbitrary websites or a productivity advantage over another product.
+
+## Public release verification
+
+- [CI run 41635889555](https://github.com/Ray0766/demopilot/actions/runs/41635889555): both Linux Node 22/24 jobs passed type checks, behavior tests, build, real E2E and recovery. The release job separately reran E2E and the actual nine-step Studio showcase before packaging.
+- [v0.2.0](https://github.com/Ray0766/demopilot/releases/tag/v0.2.0) points to `463ff3af6bcff14e47b4e65eaaaaf7e4170590aa`, verified by fetching the remote tag and main. This includes regenerated Linux media. Local branch `codex/editable-composition` preserves the Windows implementation/media commit `baf910d` and subsequent receipt.
+- Downloaded all three public assets. Their byte counts and SHA-256 match GitHub's published digests; see [release receipt](evidence/release-v0.2.0.json). Package: 354,160 bytes; showcase MP4: 888,681 bytes; demo GIF: 2,547,600 bytes.
+- The public package installs into an isolated directory and reports CLI 0.2.0 / `doctor` ready. The downloaded MP4 and GIF fully decode; the 31.367-second showcase is H.264, 1280 × 900, 30 fps. Reviewed eight public-video frames and the actual Linux Studio screenshot. No claims of audience comprehension or broad-site reliability are added by these checks.
 
 ## Boundaries
 

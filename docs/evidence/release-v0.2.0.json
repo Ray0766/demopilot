@@ -1,0 +1,63 @@
+{
+  "version": "0.2.0",
+  "date": "2026-11-03",
+  "release": "https://github.com/Ray0766/demopilot/releases/tag/v0.2.0",
+  "tagCommit": "463ff3af6bcff14e47b4e65eaaaaf7e4170590aa",
+  "sourceCommit": "f468e5c676dd365d71b4449dceb387633f008fc1",
+  "ci": {
+    "run": 41635889555,
+    "url": "https://github.com/Ray0766/demopilot/actions/runs/41635889555",
+    "jobs": [
+      {
+        "id": 125916856476,
+        "name": "verify (22)",
+        "conclusion": "success"
+      },
+      {
+        "id": 125916856806,
+        "name": "verify (24)",
+        "conclusion": "success"
+      },
+      {
+        "id": 125919128287,
+        "name": "release",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "assets": [
+    {
+      "name": "demo.gif",
+      "bytes": 2547600,
+      "digest": "sha256:f6c5f8b6c9d9e2609f031bdc3c1410aec460dc13327711483e7b2610e291fb2f",
+      "downloadMatched": true
+    },
+    {
+      "name": "ray0766-demopilot-0.2.0.tgz",
+      "bytes": 354160,
+      "digest": "sha256:875a512da2efe9b0fad3c7e18ec40a460909874e64d583a048990ade252582bf",
+      "downloadMatched": true
+    },
+    {
+      "name": "showcase.mp4",
+      "bytes": 888681,
+      "digest": "sha256:d34797843e8989102ee4ccf660368517a445e47c21796cc0ae590a049dd5e573",
+      "downloadMatched": true
+    }
+  ],
+  "publicPackage": {
+    "isolatedProductionInstall": true,
+    "cli": "0.2.0",
+    "doctor": "ready"
+  },
+  "publicMedia": {
+    "decodedMp4": true,
+    "decodedGif": true,
+    "showcaseDuration": 31.366667,
+    "width": 1280,
+    "height": 900,
+    "fps": 30,
+    "inspectedFrames": 8,
+    "studioScreenshotInspected": true
+  }
+}
