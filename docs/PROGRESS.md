@@ -39,3 +39,13 @@
 - Produced and reviewed the 30.9 s, nine-step self-recorded showcase (`test-results/showcase-1793689509427`): two actual source takes, edited caption/frame retained, stable step IDs. Fully decoded MP4/GIF and inspected eight final frames. Preserving the Windows code/media on local branch `design/canvas-studio`; GitHub CI/release verification remains pending.
 - Published v0.1.2 after Linux Node 22/24 verification and the release job passed (run 41594494552). Fetched and verified tag `860584090a2a770f1094d876fb1cc6840e8209f8`; public package/MP4/GIF sizes and SHA-256 digests match (`test-results/release-v0.1.2-receipt.json`). Reviewed the final Linux Studio screenshot.
 - Installed the Windows release package into an isolated directory; CLI 0.1.2 and doctor pass. Main follows the public release; `design/canvas-studio` retains Windows code/media. UI revision complete. User preference, broad browser compatibility and full accessibility audit remain unverified; see UI-DESIGN.md and VALIDATION-v0.1.2.md.
+
+## Art direction revision — 2026-11-03
+
+- User clarified the issue as repeated boxes and insufficient artistic composition. Fetched main at `2fa10285825e2deb59d5e081ac68731b198b28db`; starting tree was clean.
+- Inspected Things' expanded task demo and Craft's actual homepage. Chose a script/footage composition, documented two directions and visual tokens in UI-ART-DIRECTION.md before implementation.
+- Removed the permanent right inspector and second toolbar. Captions are the script's editable text; action/timing controls unfold in place. Reworked the synthetic sample as a project list and removed inactive navigation.
+- First core run passed (`test-results/e2e-1793696361300`): 3/3 recordings, zero retries, offline rerender with unchanged source hashes, all templates, playback/download and responsive checks. Recovery passed all 13 conditions (`test-results/recovery-1793696427072`). Updated recovery automation to expand the new controls.
+- Visual review found too little footage space on short windows. Compacted the captured scene strip and download row, and fixed title overflow. Final checks and publication are pending.
+- Final Windows core checks passed (`test-results/e2e-1793696654780`), including keyboard disclosures and long CJK captions. Reviewed desktop, mobile and expanded-text screenshots. The 30.933 s showcase (`test-results/showcase-1793696655105`) proves two takes with retained edits; MP4/GIF decode and eight-frame review passed. Aligned the standalone sample recipe and public test captions with the built-in action wording.
+- Prepared v0.1.3 and its release/validation notes. No dependency or backend change. Preserving the local code/media on `design/script-studio` before GitHub publication.

@@ -3,7 +3,6 @@ import {
   ArrowDown,
   ArrowUp,
   Check,
-  ChevronRight,
   CircleHelp,
   Clapperboard,
   Download,
@@ -394,47 +393,12 @@ export function App() {
           <img src="/icon.svg" alt="" />
           DemoPilot
         </a>
-        <div className="project-name">
+        <span className="local-badge">
+          <span />
+          Local studio
+        </span>
+        <div className="file-actions">
           {" "}
-          <input
-            aria-label="Demo title"
-            value={recipe.title}
-            maxLength={80}
-            disabled={busy}
-            onChange={(event) =>
-              change({ ...recipe, title: event.target.value })
-            }
-          />
-          <span className="saved-label">
-            {storageWarning
-              ? "Draft not saved · download recipe"
-              : "Local draft"}
-          </span>
-        </div>
-        <div className="header-right">
-          <span className="local-badge">
-            <span />
-            Local studio
-          </span>
-          <button
-            className="icon-button"
-            aria-label="Open help"
-            onClick={() => setHelp(true)}
-          >
-            <CircleHelp size={19} />
-          </button>
-          <a
-            className="github-link"
-            href="https://github.com/Ray0766/demopilot"
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
-          </a>
-        </div>
-      </header>
-      <div className="project-bar">
-        <div className="project-actions">
           <button
             className="quiet"
             disabled={busy}
@@ -457,66 +421,86 @@ export function App() {
               event.target.value = "";
             }}
           />
-          <div className="primary-actions">
-            {opening ? (
-              <button className="primary" disabled>
-                <LoaderCircle size={17} className="spin" />
-                Opening saved work…
-              </button>
-            ) : running ? (
-              <>
-                <button className="primary recording-button" disabled>
-                  <LoaderCircle size={17} className="spin" />
-                  {job.kind === "record" ? "Recording…" : "Rendering…"}
-                </button>
-                <button
-                  className="secondary"
-                  onClick={() => {
-                    void api(`/api/jobs/${job.id}/cancel`, {}).catch((cause) =>
-                      setError(cause.message),
-                    );
-                  }}
-                >
-                  <Square size={13} />
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  className={matches ? "secondary" : "primary"}
-                  disabled={!token}
-                  onClick={() => void start("record")}
-                >
-                  <span className="record-dot" />
-                  {recording ? "Record again" : "Record demo"}
-                </button>
-                <button
-                  className={matches ? "primary export-button" : "secondary"}
-                  disabled={!matches || !token}
-                  onClick={() => void start("render")}
-                >
-                  <Download size={16} />
-                  {output ? "Update export" : "Export MP4 + GIF"}
-                </button>
-              </>
-            )}
-            {recording && !matches && (
-              <p className="mismatch">
-                The workflow changed. Record again to capture the updated steps.
-              </p>
-            )}
-          </div>
         </div>
-      </div>
+        <div className="primary-actions">
+          {opening ? (
+            <button className="primary" disabled>
+              <LoaderCircle size={17} className="spin" />
+              Opening saved work…
+            </button>
+          ) : running ? (
+            <>
+              <button className="primary recording-button" disabled>
+                <LoaderCircle size={17} className="spin" />
+                {job.kind === "record" ? "Recording…" : "Rendering…"}
+              </button>
+              <button
+                className="secondary"
+                onClick={() => {
+                  void api(`/api/jobs/${job.id}/cancel`, {}).catch((cause) =>
+                    setError(cause.message),
+                  );
+                }}
+              >
+                <Square size={13} />
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className={matches ? "secondary" : "primary"}
+                disabled={!token}
+                onClick={() => void start("record")}
+              >
+                <span className="record-dot" />
+                {recording ? "Record again" : "Record demo"}
+              </button>
+              <button
+                className={matches ? "primary export-button" : "secondary"}
+                disabled={!matches || !token}
+                onClick={() => void start("render")}
+              >
+                <Download size={16} />
+                {output ? "Update export" : "Export MP4 + GIF"}
+              </button>
+            </>
+          )}
+          {recording && !matches && (
+            <p className="mismatch">
+              The workflow changed. Record again to capture the updated steps.
+            </p>
+          )}
+        </div>
+        <button
+          className="icon-button"
+          aria-label="Open help"
+          onClick={() => setHelp(true)}
+        >
+          <CircleHelp size={19} />
+        </button>
+      </header>
       <main className="workspace">
         <aside className="outline">
-          <div className="section-heading">
-            <div>
-              <h1>Recording recipe</h1>
-              <p>Run these steps again, keep your edits.</p>
-            </div>
+          <div className="project-name">
+            {" "}
+            <textarea
+              rows={1}
+              aria-label="Demo title"
+              value={recipe.title}
+              maxLength={80}
+              disabled={busy}
+              onChange={(event) =>
+                change({ ...recipe, title: event.target.value })
+              }
+            />
+            <span className="saved-label">
+              {storageWarning
+                ? "Draft not saved · download recipe"
+                : "Local draft"}
+            </span>
           </div>
+
           <label className="field url-field">
             <span>
               <Globe size={14} />
@@ -532,10 +516,432 @@ export function App() {
               }
             />
           </label>
-          <div className="outline-label">
-            <span>
-              Steps <b>{recipe.steps.length}</b>
-            </span>
+          <div
+            className="inspector-tabs"
+            role="group"
+            aria-label="Inspector view"
+          >
+            <button
+              aria-pressed={inspector === "scene"}
+              onClick={() => setInspector("scene")}
+            >
+              Script
+            </button>
+            <button
+              aria-pressed={inspector === "frame"}
+              onClick={() => setInspector("frame")}
+            >
+              Frame & export
+            </button>
+          </div>
+
+          {inspector === "scene" ? (
+            <section className="script-editor" aria-label="Recording recipe">
+              <ol className="steps">
+                {recipe.steps.map((item, index) => (
+                  <li
+                    key={item.id}
+                    className={index === selected ? "selected" : ""}
+                  >
+                    <button
+                      className="step-item"
+                      aria-current={index === selected ? "step" : undefined}
+                      onClick={() => {
+                        setSelected(index);
+                        if (recording) setView("source");
+                      }}
+                    >
+                      <span className="step-number">
+                        {job?.stepId === item.id && busy ? (
+                          <LoaderCircle size={16} className="spin" />
+                        ) : (
+                          String(index + 1).padStart(2, "0")
+                        )}
+                      </span>
+                      <span className="step-action">
+                        {actionLabels[item.action]}{" "}
+                        {item.target.replace(
+                          /^(role:[^:]+:|label:|text:|testid:)/,
+                          "",
+                        ) ||
+                          item.value ||
+                          "page"}
+                      </span>
+                    </button>
+                    {index === selected ? (
+                      <div className="scene-writing">
+                        <label className="caption-field">
+                          <span className="sr-only">
+                            Caption for scene {index + 1}
+                          </span>
+                          <textarea
+                            value={item.caption}
+                            maxLength={160}
+                            rows={1}
+                            disabled={busy}
+                            placeholder="What should the viewer notice?"
+                            onChange={(event) =>
+                              patchStep({ caption: event.target.value })
+                            }
+                          />
+                        </label>
+                        <div className="scene-detail-actions">
+                          <details className="action-disclosure">
+                            <summary>Action & target</summary>{" "}
+                            <div className="step-editor">
+                              <div className="editor-heading">
+                                <strong>Step {selected + 1} action</strong>
+                                <div>
+                                  <button
+                                    className="icon-button"
+                                    aria-label="Move step up"
+                                    disabled={busy || selected === 0}
+                                    onClick={() => moveStep(-1)}
+                                  >
+                                    <ArrowUp size={14} />
+                                  </button>
+                                  <button
+                                    className="icon-button"
+                                    aria-label="Move step down"
+                                    disabled={
+                                      busy ||
+                                      selected === recipe.steps.length - 1
+                                    }
+                                    onClick={() => moveStep(1)}
+                                  >
+                                    <ArrowDown size={14} />
+                                  </button>
+                                  <button
+                                    className="icon-button danger"
+                                    aria-label="Delete step"
+                                    disabled={busy || recipe.steps.length === 1}
+                                    onClick={() => {
+                                      change({
+                                        ...recipe,
+                                        steps: recipe.steps.filter(
+                                          (item) => item.id !== step.id,
+                                        ),
+                                      });
+                                      setSelected(Math.max(0, selected - 1));
+                                    }}
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                              <label className="field">
+                                <span>Action</span>
+                                <select
+                                  value={step.action}
+                                  disabled={busy}
+                                  onChange={(event) =>
+                                    patchStep({
+                                      action: event.target
+                                        .value as Step["action"],
+                                    })
+                                  }
+                                >
+                                  {Object.entries(actionLabels).map(
+                                    ([value, label]) => (
+                                      <option key={value} value={value}>
+                                        {label}
+                                      </option>
+                                    ),
+                                  )}
+                                </select>
+                              </label>
+                              {!["scroll", "navigate"].includes(
+                                step.action,
+                              ) && (
+                                <label className="field">
+                                  <span>
+                                    Target{" "}
+                                    <button
+                                      className="inline-help"
+                                      aria-label="Target syntax help"
+                                      onClick={() => setHelp(true)}
+                                      type="button"
+                                    >
+                                      ?
+                                    </button>
+                                  </span>
+                                  <input
+                                    aria-label="Target"
+                                    value={step.target}
+                                    disabled={busy}
+                                    placeholder="role:button:New project"
+                                    onChange={(event) =>
+                                      patchStep({ target: event.target.value })
+                                    }
+                                  />
+                                </label>
+                              )}
+                              {[
+                                "fill",
+                                "press",
+                                "navigate",
+                                "select",
+                                "scroll",
+                              ].includes(step.action) && (
+                                <label className="field">
+                                  <span>
+                                    {step.action === "scroll"
+                                      ? "Distance in pixels"
+                                      : step.action === "press"
+                                        ? "Key (e.g. Enter)"
+                                        : step.action === "navigate"
+                                          ? "Destination URL"
+                                          : "Value"}
+                                  </span>
+                                  <input
+                                    value={step.value}
+                                    disabled={busy}
+                                    onChange={(event) =>
+                                      patchStep({ value: event.target.value })
+                                    }
+                                  />
+                                </label>
+                              )}
+                              <label className="field">
+                                <span>
+                                  Wait for result <small>optional</small>
+                                </span>
+                                <input
+                                  value={step.waitFor}
+                                  disabled={busy}
+                                  placeholder="text:Project created"
+                                  onChange={(event) =>
+                                    patchStep({ waitFor: event.target.value })
+                                  }
+                                />
+                              </label>
+                            </div>
+                          </details>
+                          <details className="timing-disclosure">
+                            <summary>Timing & zoom</summary>
+                            <div className="cut-controls">
+                              {" "}
+                              <label className="field">
+                                <span>
+                                  Focus zoom <b>{step.zoom.toFixed(1)}×</b>
+                                </span>
+                                <input
+                                  type="range"
+                                  min="1"
+                                  max="1.8"
+                                  step="0.1"
+                                  value={step.zoom}
+                                  disabled={busy}
+                                  onChange={(event) =>
+                                    patchStep({
+                                      zoom: Number(event.target.value),
+                                    })
+                                  }
+                                />
+                                <small>Follows the action target</small>
+                              </label>
+                              <label className="field">
+                                <span>Hold the result</span>
+                                <select
+                                  value={step.holdMs}
+                                  disabled={busy}
+                                  onChange={(event) =>
+                                    patchStep({
+                                      holdMs: Number(event.target.value),
+                                    })
+                                  }
+                                >
+                                  {[
+                                    500, 1000, 1500, 1600, 1800, 2000, 2200,
+                                    2800, 3000, 4000, 6000, 8000,
+                                  ].map((ms) => (
+                                    <option key={ms} value={ms}>
+                                      {ms / 1000} seconds
+                                    </option>
+                                  ))}
+                                  {![
+                                    500, 1000, 1500, 1600, 1800, 2000, 2200,
+                                    2800, 3000, 4000, 6000, 8000,
+                                  ].includes(step.holdMs) && (
+                                    <option value={step.holdMs}>
+                                      {step.holdMs / 1000} seconds
+                                    </option>
+                                  )}
+                                </select>
+                              </label>
+                            </div>
+                            <div className="trim-controls">
+                              <h3>Trim scene</h3>
+                              <label>
+                                Start{" "}
+                                <input
+                                  aria-label="Trim start seconds"
+                                  type="number"
+                                  min="0"
+                                  max="60"
+                                  step="0.1"
+                                  disabled={busy}
+                                  value={step.trimStart}
+                                  onChange={(event) =>
+                                    patchStep({
+                                      trimStart: Number(event.target.value),
+                                    })
+                                  }
+                                />{" "}
+                                s
+                              </label>
+                              <label>
+                                End{" "}
+                                <input
+                                  aria-label="Trim end seconds"
+                                  type="number"
+                                  min="0"
+                                  max="60"
+                                  step="0.1"
+                                  disabled={busy}
+                                  value={step.trimEnd}
+                                  onChange={(event) =>
+                                    patchStep({
+                                      trimEnd: Number(event.target.value),
+                                    })
+                                  }
+                                />{" "}
+                                s
+                              </label>
+                            </div>
+                          </details>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        className="script-caption"
+                        onClick={() => {
+                          setSelected(index);
+                          if (recording) setView("source");
+                        }}
+                      >
+                        {item.caption || "Add a caption"}
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ol>
+              <div className="script-actions">
+                <button
+                  className="add-step"
+                  disabled={busy || recipe.steps.length >= 40}
+                  onClick={() => {
+                    change({
+                      ...recipe,
+                      steps: [
+                        ...recipe.steps,
+                        stepSchema.parse({
+                          id: `step-${crypto.randomUUID().slice(0, 8)}`,
+                          action: "click",
+                          target: "role:button:Button name",
+                        }),
+                      ],
+                    });
+                    setSelected(recipe.steps.length);
+                  }}
+                >
+                  <Plus size={15} />
+                  Add a step
+                </button>
+                <button
+                  className="quiet"
+                  disabled={!history.length || busy}
+                  onClick={() => {
+                    const previous = history.at(-1);
+                    if (previous) {
+                      setRecipe(previous);
+                      setSelected(0);
+                      setHistory(history.slice(0, -1));
+                    }
+                  }}
+                >
+                  <RotateCcw size={14} />
+                  Undo
+                </button>
+              </div>
+            </section>
+          ) : (
+            <section
+              className="frame-editor"
+              aria-label="Frame and export settings"
+            >
+              {" "}
+              <fieldset className="templates" disabled={busy}>
+                <legend>Visual style</legend>
+                {(["studio", "paper", "midnight"] as const).map((name) => (
+                  <label
+                    className={`template-option ${recipe.template === name ? "selected" : ""}`}
+                    key={name}
+                  >
+                    <input
+                      type="radio"
+                      name="template"
+                      value={name}
+                      checked={recipe.template === name}
+                      onChange={() => change({ ...recipe, template: name })}
+                    />
+                    <span className={`template-preview ${name}`}>
+                      <span />
+                      <i />
+                    </span>
+                    <span>
+                      <strong>
+                        {name.charAt(0).toUpperCase() + name.slice(1)}
+                      </strong>
+                      <small>
+                        {name === "studio"
+                          ? "Soft blue frame"
+                          : name === "paper"
+                            ? "Light green frame"
+                            : "Dark blue frame"}
+                      </small>
+                    </span>
+                    {recipe.template === name && <Check size={15} />}
+                  </label>
+                ))}
+              </fieldset>
+              <div className="pacing">
+                <label className="check-field">
+                  <input
+                    type="checkbox"
+                    checked={recipe.trimWaiting}
+                    disabled={busy}
+                    onChange={(event) =>
+                      change({ ...recipe, trimWaiting: event.target.checked })
+                    }
+                  />
+                  <span>Cut long result waits</span>
+                </label>
+                <p>
+                  Keeps the action and its result. Edited pacing is labeled in
+                  the video.
+                </p>
+              </div>
+              <div className="export-summary">
+                <h3>Export formats</h3>
+                <div>
+                  <Film size={18} />
+                  <span>
+                    <strong>Release video</strong>
+                    <small>MP4 · 1280 × 900 · 30 fps</small>
+                  </span>
+                </div>
+                <div>
+                  <Clapperboard size={18} />
+                  <span>
+                    <strong>README animation</strong>
+                    <small>GIF · 800 px · first 30 seconds</small>
+                  </span>
+                </div>
+              </div>
+            </section>
+          )}
+          <div className="recipe-tools">
             <button
               className="text-button"
               disabled={busy}
@@ -546,256 +952,98 @@ export function App() {
                 setOutput(null);
               }}
             >
-              Load sample
-            </button>
-          </div>
-          <ol className="steps">
-            {recipe.steps.map((item, index) => (
-              <li key={item.id}>
-                <button
-                  className={`step-item ${index === selected ? "selected" : ""} ${job?.stepId === item.id && busy ? "recording" : ""}`}
-                  onClick={() => {
-                    setSelected(index);
-                    setInspector("scene");
-                  }}
-                  aria-current={index === selected ? "step" : undefined}
-                >
-                  <span className="step-number">
-                    {job?.stepId === item.id && busy ? (
-                      <LoaderCircle size={16} className="spin" />
-                    ) : (
-                      String(index + 1).padStart(2, "0")
-                    )}
-                  </span>
-                  <span className="step-copy">
-                    <strong>{actionLabels[item.action]}</strong>
-                    <small>
-                      <span>{item.target || item.value || "page"}</span>
-                    </small>
-                  </span>
-                  <ChevronRight size={15} />
-                </button>
-              </li>
-            ))}
-          </ol>
-          <button
-            className="add-step"
-            disabled={busy || recipe.steps.length >= 40}
-            onClick={() => {
-              change({
-                ...recipe,
-                steps: [
-                  ...recipe.steps,
-                  stepSchema.parse({
-                    id: `step-${crypto.randomUUID().slice(0, 8)}`,
-                    action: "click",
-                    target: "role:button:Button name",
-                  }),
-                ],
-              });
-              setSelected(recipe.steps.length);
-            }}
-          >
-            <Plus size={16} />
-            Add a step
-          </button>
-          <div className="step-editor">
-            <div className="editor-heading">
-              <strong>Step {selected + 1} action</strong>
-              <div>
-                <button
-                  className="icon-button"
-                  aria-label="Move step up"
-                  disabled={busy || selected === 0}
-                  onClick={() => moveStep(-1)}
-                >
-                  <ArrowUp size={14} />
-                </button>
-                <button
-                  className="icon-button"
-                  aria-label="Move step down"
-                  disabled={busy || selected === recipe.steps.length - 1}
-                  onClick={() => moveStep(1)}
-                >
-                  <ArrowDown size={14} />
-                </button>
-                <button
-                  className="icon-button danger"
-                  aria-label="Delete step"
-                  disabled={busy || recipe.steps.length === 1}
-                  onClick={() => {
-                    change({
-                      ...recipe,
-                      steps: recipe.steps.filter((item) => item.id !== step.id),
-                    });
-                    setSelected(Math.max(0, selected - 1));
+              Load sample recipe
+            </button>{" "}
+            {recordings.length > 0 && (
+              <label className="field recordings-field">
+                <span>
+                  <FolderOpen size={14} />
+                  Previous recordings
+                </span>
+                <select
+                  aria-label="Previous recordings"
+                  disabled={busy}
+                  value={recording?.id || ""}
+                  onChange={(event) => {
+                    const item = recordings.find(
+                      (item) => item.id === event.target.value,
+                    );
+                    if (item) void openRecording(item);
                   }}
                 >
-                  <Trash2 size={14} />
-                </button>
-              </div>
+                  <option value="" disabled>
+                    Open a recording…
+                  </option>
+                  {recordings.map((item) => (
+                    <option value={item.id} key={item.id}>
+                      {item.recipe.title} ·{" "}
+                      {new Date(item.createdAt).toLocaleTimeString()}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <div className="outline-footer">
+              <button
+                className="quiet"
+                aria-expanded={settings}
+                onClick={() => setSettings(!settings)}
+              >
+                <Settings2 size={16} />
+                Recording settings
+              </button>
+              {settings && (
+                <div className="record-settings">
+                  <label className="field">
+                    <span>Viewport</span>
+                    <select
+                      disabled={busy}
+                      value={`${recipe.viewport.width}x${recipe.viewport.height}`}
+                      onChange={(event) => {
+                        const [width, height] = event.target.value
+                          .split("x")
+                          .map(Number);
+                        change({ ...recipe, viewport: { width, height } });
+                      }}
+                    >
+                      <option value="1280x800">1280 × 800</option>
+                      <option value="1440x900">1440 × 900</option>
+                      <option value="1920x1080">1920 × 1080</option>
+                      {!["1280x800", "1440x900", "1920x1080"].includes(
+                        `${recipe.viewport.width}x${recipe.viewport.height}`,
+                      ) && (
+                        <option
+                          value={`${recipe.viewport.width}x${recipe.viewport.height}`}
+                        >
+                          {recipe.viewport.width} × {recipe.viewport.height}
+                        </option>
+                      )}
+                    </select>
+                  </label>
+                  <label className="field">
+                    <span>Timeout per action (seconds)</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="60"
+                      value={recipe.timeoutMs / 1000}
+                      disabled={busy}
+                      onChange={(event) =>
+                        change({
+                          ...recipe,
+                          timeoutMs: Number(event.target.value) * 1000,
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+              )}
+              <p>
+                A fresh browser session, every time.
+                <br />
+                Use demo data you can share publicly.
+              </p>
             </div>
-            <label className="field">
-              <span>Action</span>
-              <select
-                value={step.action}
-                disabled={busy}
-                onChange={(event) =>
-                  patchStep({ action: event.target.value as Step["action"] })
-                }
-              >
-                {Object.entries(actionLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {!["scroll", "navigate"].includes(step.action) && (
-              <label className="field">
-                <span>
-                  Target{" "}
-                  <button
-                    className="inline-help"
-                    aria-label="Target syntax help"
-                    onClick={() => setHelp(true)}
-                    type="button"
-                  >
-                    ?
-                  </button>
-                </span>
-                <input
-                  aria-label="Target"
-                  value={step.target}
-                  disabled={busy}
-                  placeholder="role:button:New project"
-                  onChange={(event) =>
-                    patchStep({ target: event.target.value })
-                  }
-                />
-              </label>
-            )}
-            {["fill", "press", "navigate", "select", "scroll"].includes(
-              step.action,
-            ) && (
-              <label className="field">
-                <span>
-                  {step.action === "scroll"
-                    ? "Distance in pixels"
-                    : step.action === "press"
-                      ? "Key (e.g. Enter)"
-                      : step.action === "navigate"
-                        ? "Destination URL"
-                        : "Value"}
-                </span>
-                <input
-                  value={step.value}
-                  disabled={busy}
-                  onChange={(event) => patchStep({ value: event.target.value })}
-                />
-              </label>
-            )}
-            <label className="field">
-              <span>
-                Wait for result <small>optional</small>
-              </span>
-              <input
-                value={step.waitFor}
-                disabled={busy}
-                placeholder="text:Project created"
-                onChange={(event) => patchStep({ waitFor: event.target.value })}
-              />
-            </label>
-          </div>
-          {recordings.length > 0 && (
-            <label className="field recordings-field">
-              <span>
-                <FolderOpen size={14} />
-                Previous recordings
-              </span>
-              <select
-                aria-label="Previous recordings"
-                disabled={busy}
-                value={recording?.id || ""}
-                onChange={(event) => {
-                  const item = recordings.find(
-                    (item) => item.id === event.target.value,
-                  );
-                  if (item) void openRecording(item);
-                }}
-              >
-                <option value="" disabled>
-                  Open a recording…
-                </option>
-                {recordings.map((item) => (
-                  <option value={item.id} key={item.id}>
-                    {item.recipe.title} ·{" "}
-                    {new Date(item.createdAt).toLocaleTimeString()}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          <div className="outline-footer">
-            <button
-              className="quiet"
-              aria-expanded={settings}
-              onClick={() => setSettings(!settings)}
-            >
-              <Settings2 size={16} />
-              Recording settings
-            </button>
-            {settings && (
-              <div className="record-settings">
-                <label className="field">
-                  <span>Viewport</span>
-                  <select
-                    disabled={busy}
-                    value={`${recipe.viewport.width}x${recipe.viewport.height}`}
-                    onChange={(event) => {
-                      const [width, height] = event.target.value
-                        .split("x")
-                        .map(Number);
-                      change({ ...recipe, viewport: { width, height } });
-                    }}
-                  >
-                    <option value="1280x800">1280 × 800</option>
-                    <option value="1440x900">1440 × 900</option>
-                    <option value="1920x1080">1920 × 1080</option>
-                    {!["1280x800", "1440x900", "1920x1080"].includes(
-                      `${recipe.viewport.width}x${recipe.viewport.height}`,
-                    ) && (
-                      <option
-                        value={`${recipe.viewport.width}x${recipe.viewport.height}`}
-                      >
-                        {recipe.viewport.width} × {recipe.viewport.height}
-                      </option>
-                    )}
-                  </select>
-                </label>
-                <label className="field">
-                  <span>Timeout per action (seconds)</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="60"
-                    value={recipe.timeoutMs / 1000}
-                    disabled={busy}
-                    onChange={(event) =>
-                      change({
-                        ...recipe,
-                        timeoutMs: Number(event.target.value) * 1000,
-                      })
-                    }
-                  />
-                </label>
-              </div>
-            )}
-            <p>
-              A fresh browser session, every time.
-              <br />
-              Use demo data you can share publicly.
-            </p>
           </div>
         </aside>
         <section className="editing-area" aria-label="Preview and editing">
@@ -946,264 +1194,57 @@ export function App() {
               {playbackError}
             </p>
           )}
-          <div className="timeline-heading">
-            <span>
-              <Film size={15} />
-              Scenes
-            </span>
-            <span>{recipe.steps.length} in sequence</span>
-          </div>
-          <div className="timeline">
-            {recipe.steps.map((item, index) => {
-              const captured = recording?.scenes.find(
-                (entry) => entry.stepId === item.id,
-              );
-              return (
-                <button
-                  className={`timeline-scene ${selected === index ? "selected" : ""}`}
-                  key={item.id}
-                  onClick={() => {
-                    setSelected(index);
-                    setInspector("scene");
-                    if (recording) setView("source");
-                  }}
-                  aria-label={`Edit scene ${index + 1}`}
-                >
-                  <div className="scene-thumbnail">
-                    {captured ? (
-                      <img
-                        src={`/media/recordings/${recording!.id}/${captured.poster}`}
-                        alt=""
-                      />
-                    ) : (
-                      <div className="placeholder-lines">
-                        <span />
-                        <span />
-                        <span />
+          {recording && (
+            <>
+              <div className="timeline-heading">
+                <span>
+                  <Film size={15} />
+                  Scenes
+                </span>
+                <span>{recipe.steps.length} in sequence</span>
+              </div>
+              <div className="timeline">
+                {recipe.steps.map((item, index) => {
+                  const captured = recording?.scenes.find(
+                    (entry) => entry.stepId === item.id,
+                  );
+                  return (
+                    <button
+                      className={`timeline-scene ${selected === index ? "selected" : ""}`}
+                      key={item.id}
+                      onClick={() => {
+                        setSelected(index);
+                        setInspector("scene");
+                        if (recording) setView("source");
+                      }}
+                      aria-label={`Edit scene ${index + 1}`}
+                    >
+                      <div className="scene-thumbnail">
+                        {captured ? (
+                          <img
+                            src={`/media/recordings/${recording!.id}/${captured.poster}`}
+                            alt=""
+                          />
+                        ) : (
+                          <div className="placeholder-lines">
+                            <span />
+                            <span />
+                            <span />
+                          </div>
+                        )}
+                        <span>{String(index + 1).padStart(2, "0")}</span>
                       </div>
-                    )}
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                  </div>
-                  <div className="scene-caption">
-                    {item.caption || actionLabels[item.action]}
-                  </div>
-                  <span className="scene-duration">
-                    {captured ? seconds(captured.duration) : "Not recorded"}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-        <aside className="finish-panel" aria-label="Scene inspector">
-          <div
-            className="inspector-tabs"
-            role="group"
-            aria-label="Inspector view"
-          >
-            <button
-              aria-pressed={inspector === "scene"}
-              onClick={() => setInspector("scene")}
-            >
-              Scene
-            </button>
-            <button
-              aria-pressed={inspector === "frame"}
-              onClick={() => setInspector("frame")}
-            >
-              Frame & export
-            </button>
-          </div>
-          {inspector === "scene" ? (
-            <section className="cut-editor" aria-label="Scene editing">
-              <div className="cut-heading">
-                <h2>Scene {selected + 1}</h2>
-                <button
-                  className="quiet"
-                  disabled={!history.length || busy}
-                  onClick={() => {
-                    const previous = history.at(-1);
-                    if (previous) {
-                      setRecipe(previous);
-                      setSelected(0);
-                      setHistory(history.slice(0, -1));
-                    }
-                  }}
-                >
-                  <RotateCcw size={14} />
-                  Undo
-                </button>
+                      <div className="scene-caption">
+                        {item.caption || actionLabels[item.action]}
+                      </div>
+                      <span className="scene-duration">
+                        {captured ? seconds(captured.duration) : "Not recorded"}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-              <div className="cut-controls">
-                <label className="field caption-field">
-                  <span>Caption for scene {selected + 1}</span>
-                  <textarea
-                    value={step.caption}
-                    maxLength={160}
-                    rows={2}
-                    disabled={busy}
-                    placeholder="What should the viewer notice?"
-                    onChange={(event) =>
-                      patchStep({ caption: event.target.value })
-                    }
-                  />
-                </label>
-                <label className="field">
-                  <span>
-                    Focus zoom <b>{step.zoom.toFixed(1)}×</b>
-                  </span>
-                  <input
-                    type="range"
-                    min="1"
-                    max="1.8"
-                    step="0.1"
-                    value={step.zoom}
-                    disabled={busy}
-                    onChange={(event) =>
-                      patchStep({ zoom: Number(event.target.value) })
-                    }
-                  />
-                  <small>Follows the action target</small>
-                </label>
-                <label className="field">
-                  <span>Hold the result</span>
-                  <select
-                    value={step.holdMs}
-                    disabled={busy}
-                    onChange={(event) =>
-                      patchStep({ holdMs: Number(event.target.value) })
-                    }
-                  >
-                    {[
-                      500, 1000, 1500, 1600, 1800, 2000, 2200, 2800, 3000, 4000,
-                      6000, 8000,
-                    ].map((ms) => (
-                      <option key={ms} value={ms}>
-                        {ms / 1000} seconds
-                      </option>
-                    ))}
-                    {![
-                      500, 1000, 1500, 1600, 1800, 2000, 2200, 2800, 3000, 4000,
-                      6000, 8000,
-                    ].includes(step.holdMs) && (
-                      <option value={step.holdMs}>
-                        {step.holdMs / 1000} seconds
-                      </option>
-                    )}
-                  </select>
-                </label>
-              </div>
-              <div className="trim-controls">
-                <h3>Trim scene</h3>
-                <label>
-                  Start{" "}
-                  <input
-                    aria-label="Trim start seconds"
-                    type="number"
-                    min="0"
-                    max="60"
-                    step="0.1"
-                    disabled={busy}
-                    value={step.trimStart}
-                    onChange={(event) =>
-                      patchStep({ trimStart: Number(event.target.value) })
-                    }
-                  />{" "}
-                  s
-                </label>
-                <label>
-                  End{" "}
-                  <input
-                    aria-label="Trim end seconds"
-                    type="number"
-                    min="0"
-                    max="60"
-                    step="0.1"
-                    disabled={busy}
-                    value={step.trimEnd}
-                    onChange={(event) =>
-                      patchStep({ trimEnd: Number(event.target.value) })
-                    }
-                  />{" "}
-                  s
-                </label>
-              </div>
-            </section>
-          ) : (
-            <section
-              className="frame-editor"
-              aria-label="Frame and export settings"
-            >
-              {" "}
-              <fieldset className="templates" disabled={busy}>
-                <legend>Visual style</legend>
-                {(["studio", "paper", "midnight"] as const).map((name) => (
-                  <label
-                    className={`template-option ${recipe.template === name ? "selected" : ""}`}
-                    key={name}
-                  >
-                    <input
-                      type="radio"
-                      name="template"
-                      value={name}
-                      checked={recipe.template === name}
-                      onChange={() => change({ ...recipe, template: name })}
-                    />
-                    <span className={`template-preview ${name}`}>
-                      <span />
-                      <i />
-                    </span>
-                    <span>
-                      <strong>
-                        {name.charAt(0).toUpperCase() + name.slice(1)}
-                      </strong>
-                      <small>
-                        {name === "studio"
-                          ? "Soft blue frame"
-                          : name === "paper"
-                            ? "Light green frame"
-                            : "Dark blue frame"}
-                      </small>
-                    </span>
-                    {recipe.template === name && <Check size={15} />}
-                  </label>
-                ))}
-              </fieldset>
-              <div className="pacing">
-                <label className="check-field">
-                  <input
-                    type="checkbox"
-                    checked={recipe.trimWaiting}
-                    disabled={busy}
-                    onChange={(event) =>
-                      change({ ...recipe, trimWaiting: event.target.checked })
-                    }
-                  />
-                  <span>Cut long result waits</span>
-                </label>
-                <p>
-                  Keeps the action and its result. Edited pacing is labeled in
-                  the video.
-                </p>
-              </div>
-              <div className="export-summary">
-                <h3>Export formats</h3>
-                <div>
-                  <Film size={18} />
-                  <span>
-                    <strong>Release video</strong>
-                    <small>MP4 · 1280 × 900 · 30 fps</small>
-                  </span>
-                </div>
-                <div>
-                  <Clapperboard size={18} />
-                  <span>
-                    <strong>README animation</strong>
-                    <small>GIF · 800 px · first 30 seconds</small>
-                  </span>
-                </div>
-              </div>
-            </section>
+            </>
           )}
           {output && (
             <div className="downloads">
@@ -1243,14 +1284,8 @@ export function App() {
               </small>
             </div>
           )}
-
-          <p className="inspector-note">
-            Edits preserve your source footage.
-            <br />
-            Export to preview the updated cut.
-          </p>
-        </aside>
-      </main>
+        </section>
+      </main>{" "}
       <footer className="status-bar" aria-live="polite">
         <span>
           {running ? (

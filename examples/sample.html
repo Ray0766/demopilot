@@ -10,8 +10,8 @@
       }
       body {
         margin: 0;
-        background: #f8f9fc;
-        color: #26324b;
+        color: #293c39;
+        background: #fff;
         font:
           16px/1.5 "Segoe UI",
           Arial,
@@ -25,260 +25,253 @@
       button {
         cursor: pointer;
       }
-      button:focus-visible,
-      input:focus-visible,
-      select:focus-visible {
-        outline: 3px solid #8093ee;
+      :is(button, input, select):focus-visible {
+        outline: 3px solid #358477;
         outline-offset: 3px;
       }
       aside {
         position: fixed;
         inset: 0 auto 0 0;
-        width: 224px;
-        padding: 36px 25px;
-        background: #fff;
-        border-right: 1px solid #e3e7ef;
+        width: 210px;
+        padding: 35px 27px;
+        background: #f1f5f2;
       }
       .brand {
         font-size: 23px;
-        font-weight: 750;
+        font-weight: 650;
         letter-spacing: -1px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
       }
       .brand span {
-        color: #57716b;
-        font-size: 32px;
+        font-size: 29px;
+        color: #578d79;
       }
       nav {
-        margin-top: 56px;
-        display: grid;
-        gap: 14px;
+        margin-top: 60px;
       }
       nav div {
-        padding: 11px 16px;
-        color: #748092;
+        padding: 10px 0;
+        font-size: 14px;
+        color: #6c7f77;
       }
-      .active {
-        background: #edf1fc;
-        border-radius: 8px;
-        color: #4055ae !important;
-        font-weight: 650;
+      nav .active {
+        color: #214f43;
+        font-weight: 600;
       }
       .workspace {
         position: absolute;
-        bottom: 28px;
+        bottom: 35px;
         font-size: 12px;
-        color: #778294;
+        color: #6c7f77;
       }
       main {
-        margin-left: 224px;
-        padding: 42px 55px;
+        margin-left: 210px;
+        padding: 45px 64px;
       }
       .top {
         display: flex;
         justify-content: space-between;
-        color: #717d91;
-        font-size: 14px;
+        color: #6e8278;
+        font-size: 13px;
       }
       .avatar {
-        background: #e4eadf;
+        font-size: 12px;
+        background: #e6eee8;
         border-radius: 50%;
-        padding: 8px 11px;
-        color: #4b6558;
-        font-weight: 650;
+        padding: 5px 8px;
       }
       .heading {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 38px 0 30px;
+        gap: 24px;
+        margin: 53px 0 42px;
       }
       h1 {
-        font-size: 36px;
-        font-weight: 650;
-        letter-spacing: -1.4px;
-        margin: 0 0 6px;
+        font-size: 43px;
+        font-weight: 500;
+        letter-spacing: -1.8px;
+        line-height: 1.15;
+        margin: 0 0 14px;
       }
       p {
-        color: #758095;
+        color: #75867e;
         margin: 0;
+        font-size: 14px;
       }
       .primary {
         border: 0;
-        border-radius: 8px;
-        color: #fff;
-        background: #5266bc;
-        padding: 11px 20px;
-        font-weight: 600;
+        border-radius: 24px;
+        color: white;
+        background: #315f50;
+        padding: 11px 21px;
+        font-size: 14px;
+        white-space: nowrap;
       }
       .primary:hover {
-        background: #4355a2;
+        background: #244a3d;
       }
       .tabs {
-        border-bottom: 1px solid #e2e7ef;
+        font-size: 12px;
+        color: #70877a;
         padding-bottom: 16px;
-        color: #5669b7;
-        font-weight: 600;
+        border-bottom: 1px solid #e6ece8;
+      }
+      .tabs span {
+        margin-left: 10px;
       }
       .grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
-        margin-top: 26px;
+        display: flex;
+        flex-direction: column;
       }
       .card {
-        border: 1px solid #e1e6ef;
-        background: #fff;
-        border-radius: 12px;
-        padding: 24px;
-        min-height: 205px;
+        display: grid;
+        grid-template-columns: 46px 1fr auto;
+        column-gap: 20px;
+        align-items: center;
+        padding: 27px 0;
+        border-bottom: 1px solid #e6ece8;
       }
       .card .icon {
-        display: inline-block;
-        background: #eef0ff;
-        color: #5266bc;
-        border-radius: 10px;
-        padding: 7px 13px;
-        font-size: 24px;
+        grid-column: 1;
+        grid-row: 1/3;
+        background: #dcece4;
+        color: #4c7c65;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
       }
       .card h2 {
-        font-size: 19px;
-        margin: 16px 0 5px;
-        letter-spacing: -0.3px;
+        grid-column: 2;
+        grid-row: 1;
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: -0.4px;
+        margin: 0 0 6px;
+      }
+      .card p {
+        grid-column: 2;
+        grid-row: 2;
+        font-size: 12px;
       }
       .meta {
+        grid-column: 3;
+        grid-row: 1/3;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 22px;
-        font-size: 12px;
-        color: #79869b;
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-end;
+        font-size: 11px;
+        color: #75867e;
       }
       .tag {
-        background: #eff5f0;
-        color: #4c735c;
-        padding: 4px 10px;
-        border-radius: 5px;
+        color: #4b7560;
       }
       .bar {
-        height: 4px;
-        background: #edf0f6;
-        border-radius: 2px;
-        margin-top: 14px;
+        display: none;
       }
-      .bar span {
-        display: block;
-        height: 4px;
-        background: #97aacb;
-        width: 55%;
-        border-radius: 2px;
+      .card.new .icon {
+        background: #c4e2ce;
+      }
+      .archive {
+        grid-column: 2;
+        margin-top: 12px;
+        justify-self: start;
+        border: 0;
+        padding: 0;
+        background: none;
+        color: #657e70;
+        text-decoration: underline;
+        font-size: 11px;
       }
       dialog {
-        border: 1px solid #e3e7f0;
-        border-radius: 16px;
+        border: 0;
+        border-radius: 14px;
         width: 480px;
-        padding: 32px;
-        color: #26324b;
-        box-shadow: 0 20px 100px #17244833;
+        padding: 36px;
+        color: #293c39;
+        box-shadow: 0 25px 100px #142f2833;
       }
       dialog::backdrop {
-        background: #26324b38;
+        background: #203d3333;
         backdrop-filter: blur(2px);
       }
       dialog h2 {
-        margin: 0 0 6px;
-        font-size: 26px;
+        font-size: 28px;
+        font-weight: 500;
+        letter-spacing: -0.6px;
+        margin: 0 0 10px;
       }
       dialog label {
         display: block;
         margin-top: 26px;
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 13px;
+        color: #677d71;
       }
       input,
       select {
         width: 100%;
-        border: 1px solid #cfd6e4;
-        border-radius: 7px;
-        padding: 10px 12px;
-        margin-top: 7px;
+        padding: 10px 0;
+        border: 0;
+        border-bottom: 1px solid #c8d7ce;
+        border-radius: 0;
         background: white;
-        color: #26324b;
-      }
-      input:focus {
-        border-color: #5266bc;
-        outline: 3px solid #5266bc20;
+        color: #293c39;
+        margin-top: 5px;
       }
       .actions {
         display: flex;
         justify-content: flex-end;
-        gap: 12px;
-        margin-top: 28px;
+        gap: 14px;
+        margin-top: 32px;
       }
       .secondary {
-        border: 1px solid #dbe1eb;
-        background: #fff;
-        border-radius: 8px;
-        padding: 10px 17px;
-        color: #5d6980;
+        border: 0;
+        background: #edf2ef;
+        color: #536b5f;
+        border-radius: 24px;
+        padding: 10px 20px;
+        font-size: 14px;
       }
       .notice {
-        padding: 12px 18px;
-        margin-top: 22px;
-        border: 1px solid #cde0ce;
-        border-radius: 8px;
-        background: #f0f7f0;
-        color: #486b4c;
+        margin-top: 20px;
+        color: #46745a;
+        font-size: 13px;
       }
       .synthetic {
         position: fixed;
-        bottom: 14px;
-        right: 24px;
-        color: #8992a1;
+        bottom: 16px;
+        right: 26px;
         font-size: 11px;
-      }
-      .empty {
-        display: none;
-      }
-      .toolbar {
-        display: flex;
-        gap: 12px;
-      }
-      .archive {
-        border: 0;
-        background: transparent;
-        color: #74849b;
-        padding: 0;
-        font-size: 12px;
-        text-decoration: underline;
-      }
-      .card.new {
-        border-color: #aeb9e5;
-        box-shadow: 0 4px 20px #5266bc12;
-      }
-      .new .bar span {
-        width: 8%;
+        color: #7a8d81;
       }
       @media (max-width: 760px) {
         aside {
-          width: 170px;
+          width: 160px;
+          padding: 28px 20px;
         }
         main {
-          margin-left: 170px;
-          padding: 26px;
-        }
-        .grid {
-          grid-template-columns: 1fr;
+          margin-left: 160px;
+          padding: 30px;
         }
         .heading {
-          align-items: flex-start;
-          gap: 14px;
           flex-direction: column;
+          align-items: flex-start;
+        }
+        .meta {
+          display: none;
+        }
+        .card {
+          grid-template-columns: 44px 1fr;
         }
         h1 {
-          font-size: 29px;
+          font-size: 32px;
         }
       }
     </style>
@@ -287,14 +280,9 @@
     <aside>
       <div class="brand"><span>▧</span>littleboard</div>
       <nav>
-        <div>Overview</div>
         <div class="active">▦ &nbsp; Projects</div>
-        <div>My tasks</div>
-        <div>Notes</div>
       </nav>
-      <div class="workspace">
-        Your ideas, a little more organized.<br />Demo workspace
-      </div>
+      <div class="workspace">Local demo workspace</div>
     </aside>
     <main>
       <div class="top">
@@ -303,7 +291,7 @@
       <div class="heading">
         <div>
           <h1>A good place to start.</h1>
-          <p>Small projects. A little momentum.</p>
+          <p>Projects for the next release.</p>
         </div>
         <button class="primary" id="new">＋ &nbsp; New project</button>
       </div>
@@ -311,8 +299,8 @@
       <div class="grid" id="projects">
         <article class="card">
           <span class="icon">◈</span>
-          <h2>The next chapter</h2>
-          <p>A home for the ideas taking shape.</p>
+          <h2>Website refresh</h2>
+          <p>Update the homepage and project documentation.</p>
           <div class="meta">
             <span>4 tasks in progress</span><span class="tag">In motion</span>
           </div>
@@ -322,8 +310,8 @@
           <span class="icon" style="background: #f4eee9; color: #9b7e61"
             >▤</span
           >
-          <h2>Make something useful</h2>
-          <p>From the first sketch to the first release.</p>
+          <h2>Release notes</h2>
+          <p>Prepare screenshots and the changelog.</p>
           <div class="meta">
             <span>2 tasks in progress</span><span class="tag">In motion</span>
           </div>
@@ -334,8 +322,8 @@
     </main>
     <dialog id="dialog">
       <form id="form">
-        <h2>A fresh start.</h2>
-        <p>Every good project starts with a small idea.</p>
+        <h2>New project</h2>
+        <p>Give this project a name.</p>
         <label for="name">Project name</label
         ><input
           id="name"
@@ -390,7 +378,7 @@
         const heading = document.createElement("h2");
         heading.textContent = name;
         const description = document.createElement("p");
-        description.textContent = "Your next good idea starts here.";
+        description.textContent = "No tasks yet. Ready to plan.";
         const meta = document.createElement("div");
         meta.className = "meta";
         meta.innerHTML =

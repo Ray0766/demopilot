@@ -62,7 +62,7 @@ The recorder uses Playwright's actionability waiting. It does not force-click, i
 
 ## Editing without replay
 
-In Studio, select a step or a scene thumbnail. **Scene** in the right inspector contains its caption, zoom, result hold and start/end trims. **Frame & export** contains the three templates and automatic wait trimming. The top toolbar records or exports; completed downloads remain below the inspector in either view. Narrow windows place the inspector below the preview.
+In Studio, select a step or a scene thumbnail. Edit the caption directly in the **Script**. Open **Action & target** to change the browser operation, or **Timing & zoom** for focus zoom, result hold and start/end trims. **Frame & export** contains the three templates and automatic wait trimming. The top toolbar records or exports; completed downloads remain below the footage. Narrow windows place the footage below the script.
 
 Each recording has an action fingerprint: URL, viewport and the ordered step IDs/actions/targets/values/result conditions. Those must match for rendering. Caption, zoom, trim, title, template, timeout and hold changes preserve identity. Changing a workflow requires **Record again**.
 
@@ -80,7 +80,7 @@ This recovery uses the same browser profile and exact Studio address (including 
 
 ## CLI commands
 
-Use `node dist/server/cli.js` from a source checkout. A release package installed via `npm install -g ./ray0766-demopilot-0.1.1.tgz` also exposes `demopilot`.
+Use `node dist/server/cli.js` from a source checkout. A release package installed via `npm install -g ./ray0766-demopilot-0.1.3.tgz` also exposes `demopilot`.
 
 ```text
 demopilot studio [--port 4310]

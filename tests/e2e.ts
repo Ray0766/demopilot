@@ -61,7 +61,7 @@ try {
   const recipe = exampleRecipe("http://127.0.0.1:4322");
   const first = await capture(recipe, root, signal, log);
   const edited = structuredClone(recipe);
-  edited.steps[0].caption = "A fresh idea, ready to ship. 新的开始";
+  edited.steps[0].caption = "Open the new project form. 新建项目。";
   edited.steps[1].zoom = 1.5;
   edited.steps[1].trimStart = 0.1;
   edited.steps[2].holdMs = 3000;
@@ -244,6 +244,25 @@ try {
       path: path.join(root, "studio-empty.png"),
       fullPage: true,
     });
+    const actionDisclosure = page.locator(".action-disclosure > summary");
+    await actionDisclosure.focus();
+    await page.keyboard.press("Enter");
+    assert.equal(
+      await page
+        .getByRole("textbox", { name: "Target", exact: true })
+        .inputValue(),
+      "role:button:New project",
+    );
+    await actionDisclosure.press("Enter");
+    const timingDisclosure = page.locator(".timing-disclosure > summary");
+    await timingDisclosure.focus();
+    await page.keyboard.press("Enter");
+    await page.getByLabel("Trim start seconds").fill("0.1");
+    await page.screenshot({
+      path: path.join(root, "studio-timing.png"),
+      fullPage: true,
+    });
+    await timingDisclosure.press("Enter");
     await page
       .getByRole("button", { name: "Record demo", exact: true })
       .click();
@@ -252,7 +271,7 @@ try {
       .waitFor({ timeout: 90000 });
     await page
       .getByRole("textbox", { name: "Caption for scene 1", exact: true })
-      .fill("A small idea. A clear next step.");
+      .fill("Open the new project form.");
     await page
       .getByRole("button", { name: "Export MP4 + GIF", exact: true })
       .click();
@@ -352,7 +371,7 @@ try {
       fullPage: true,
     });
     await page.getByRole("radio", { name: /Studio/ }).check();
-    await page.getByRole("button", { name: "Scene", exact: true }).click();
+    await page.getByRole("button", { name: "Script", exact: true }).click();
     assert.equal(
       await page
         .getByRole("textbox", { name: "Caption for scene 2", exact: true })
@@ -392,6 +411,25 @@ try {
       });
     }
     await page.setViewportSize({ width: 1600, height: 1120 });
+    const captionTwo = page.getByRole("textbox", {
+      name: "Caption for scene 2",
+      exact: true,
+    });
+    const previousCaption = await captionTwo.inputValue();
+    await captionTwo.fill(
+      "Keep the project name readable while the same workflow records again. 编辑字幕不会改变原始录像；较长的中文和英文内容也应完整显示。",
+    );
+    assert.ok(
+      await captionTwo.evaluate(
+        (el: HTMLTextAreaElement) => el.scrollHeight <= el.clientHeight + 1,
+      ),
+      "Long captions must expand instead of clipping",
+    );
+    await page.screenshot({
+      path: path.join(root, "studio-long-caption.png"),
+      fullPage: true,
+    });
+    await captionTwo.fill(previousCaption);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.getByRole("button", { name: "Open help", exact: true }).click();
     await page.getByRole("dialog").waitFor();
@@ -426,6 +464,8 @@ try {
       helpKeyboardFocus: true,
       externalPlaybackControls: true,
       keyboardSeek: true,
+      keyboardDisclosures: true,
+      inlineCaptionExpansion: true,
       pageErrors: errors,
     };
     const publicDir = path.resolve("docs", "media");

@@ -10,7 +10,7 @@
 
 **DemoPilot is a local recording and editing studio for developers shipping browser apps.** Give it a URL and explicit steps. It operates Chromium, records the real page, and turns the footage into a release video and a short README animation. Save the recipe alongside your code and record it again when the app changes.
 
-**v0.1.2:** a canvas-led Studio with scene editing beside the preview and draft recovery across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
+**v0.1.3:** an editable script beside the footage, with action and timing controls that unfold in place. Drafts recover across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
 
 ## Try it
 
@@ -29,7 +29,7 @@ npm start
 Open **http://127.0.0.1:4310**. The included Littleboard sample uses synthetic data and needs no login:
 
 1. Click **Record demo**. Watch three steps run in a fresh browser.
-2. Select a scene. Change its caption, zoom, result hold or trims in **Scene**. Choose a template in **Frame & export**.
+2. Select a scene. Edit its caption in **Script**; open **Timing & zoom** for hold, zoom and trims. Choose a template in **Frame & export**.
 3. Click **Export MP4 + GIF**. Preview the actual export and download both files.
 
 Want to skip the editor? `npm run demo` starts its own sample server, records the workflow, and writes `output/demo/demo.mp4` and `output/demo/demo.gif`.
@@ -89,7 +89,7 @@ For a GitHub README, copy the GIF into your repository and add:
 ![Product demo](docs/demo.gif)
 ```
 
-[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Current validation](docs/VALIDATION-v0.1.2.md) · [UI references and design](docs/UI-DESIGN.md) · [Technical decisions](docs/DECISIONS.md)
+[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Current validation](docs/VALIDATION-v0.1.3.md) · [UI references and design](docs/UI-ART-DIRECTION.md) · [Technical decisions](docs/DECISIONS.md)
 
 ## Boundaries of this release
 

@@ -62,6 +62,7 @@ try {
     exact: true,
   });
   await caption.fill("A draft worth keeping. 保留这次编辑。");
+  await page.locator(".timing-disclosure > summary").click();
   await page.getByLabel("Trim start seconds").fill("0.1");
   await page
     .getByRole("combobox", { name: /Hold the result/ })
@@ -90,6 +91,7 @@ try {
     await caption.inputValue(),
     "An unpublished change survives reload. 未导出的修改。",
   );
+  await page.locator(".timing-disclosure > summary").click();
   assert.equal(await page.getByLabel("Trim start seconds").inputValue(), "0.1");
   assert.equal(
     await page.getByRole("combobox", { name: /Hold the result/ }).inputValue(),
@@ -180,12 +182,14 @@ try {
     .waitFor();
   // An incomplete target is still an edit, not a reason to discard the workspace.
   const target = page.getByRole("textbox", { name: "Target", exact: true });
+  await page.locator(".action-disclosure > summary").click();
   const originalTarget = await target.inputValue();
   await target.fill("");
   await page.reload();
   await page
     .getByRole("button", { name: "Record again", exact: true })
     .waitFor();
+  await page.locator(".action-disclosure > summary").click();
   assert.equal(await target.inputValue(), "");
   assert.equal(
     await page

@@ -83,7 +83,7 @@ const recipe = recipeSchema.parse({
     {
       id: "return-to-scene",
       action: "click",
-      target: "role:button:Scene",
+      target: "role:button:Script",
       caption: "The edited caption stays attached to its step.",
       holdMs: 1000,
     },

@@ -44,3 +44,7 @@ Review against the brief removed a generic marketing hero and decorative gradien
 ## v0.1.2 design revision
 
 The first UI still overused panel headlines, borders and promotional copy. The user's review prompted a canvas-led layout with a contextual scene inspector, literal sample captions and restrained action hierarchy. See [the reference analysis, alternatives, current tokens and boundaries](UI-DESIGN.md). This supersedes the initial layout/tokens above and keeps the capture/render/recovery architecture.
+
+## v0.1.3 art direction
+
+The user also rejected v0.1.2's boxed property-editor composition. [Script and screening room](UI-ART-DIRECTION.md) supersedes that layout: inline captions, contextual native disclosures and a single footage area. The document records actual Things/Craft page observations, two alternatives, tokens, technical reasons and limits. The backend and pinned dependencies are retained. No improvement in task time or user preference is claimed.
