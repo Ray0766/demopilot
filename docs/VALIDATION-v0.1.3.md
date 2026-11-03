@@ -29,7 +29,11 @@ Public sample captions use literal action descriptions. The local test screensho
 
 ## Release
 
-Local implementation checks have passed. GitHub publication and public-asset verification are recorded here after they complete; the existence of this document alone is not evidence of publication.
+[GitHub Actions run 41608621926](https://github.com/Ray0766/demopilot/actions/runs/41608621926) passed both Linux Node 22/24 verification jobs and the release job. Those runs exercised the final literal captions, complete core flow, recovery and the two-take showcase.
+
+[v0.1.3](https://github.com/Ray0766/demopilot/releases/tag/v0.1.3) is public. Fetch verified tag `4dd5ff2d371ceb764a026d36fb766c2ca06f749b`. All three downloaded release assets match their published SHA-256 and byte counts: package 144,658 bytes, MP4 760,012 bytes (30.967 s), GIF 1,296,237 bytes. The repository MP4/GIF hashes match the release downloads. Receipt: `test-results/release-v0.1.3-receipt.json`.
+
+The public MP4 fully decodes with FFmpeg. The final Linux Studio screenshot was opened and visually inspected. The downloaded public package installs with production dependencies into `test-results/public-package-v013`; CLI reports 0.1.3 and doctor reports Chromium 156.0.8078.4, FFmpeg/ffprobe 8.1 and readiness. This reuses installed browser/system dependencies. The package is distributed through GitHub Releases, not the npm registry.
 
 ## Limits
 
