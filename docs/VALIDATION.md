@@ -1,5 +1,7 @@
 # Validation for v0.1.0
 
+This page preserves the first release's measurements. See [v0.1.1 recovery validation](VALIDATION-v0.1.1.md) for the subsequent editing recovery fix and current release verification.
+
 Executed 2026-11-03. The recorded website and product data are synthetic. This is a repeatability smoke test, not a general reliability or performance benchmark.
 
 ## Environment and reproducibility
@@ -40,8 +42,8 @@ The whole E2E suite, including multiple records/renders and UI interaction, took
 
 ## Reviewed artifacts
 
-- [README animation](media/demo.gif), [sample MP4](media/demo.mp4), [Studio screenshot](media/studio.png).
-- [DemoPilot recording itself](media/showcase.mp4): the published Linux MP4 is 21.700 s / 682,026 bytes. The original Windows run was 21.733 s / 656,254 bytes, with a 3,582,130-byte GIF. Six explicit steps: show recipe, record, edit caption, change style, export and play. Recorded at 1440 × 1000, which also exercises a different page layout/aspect ratio.
+- v0.1.0 artifacts: [README animation](https://github.com/Ray0766/demopilot/blob/v0.1.0/docs/media/demo.gif), [sample MP4](https://github.com/Ray0766/demopilot/blob/v0.1.0/docs/media/demo.mp4), [Studio screenshot](https://github.com/Ray0766/demopilot/blob/v0.1.0/docs/media/studio.png).
+- [DemoPilot recording itself at v0.1.0](https://github.com/Ray0766/demopilot/blob/v0.1.0/docs/media/showcase.mp4): the published Linux MP4 is 21.700 s / 682,026 bytes. The original Windows run was 21.733 s / 656,254 bytes, with a 3,582,130-byte GIF. Six explicit steps: show recipe, record, edit caption, change style, export and play. Recorded at 1440 × 1000, which also exercises a different page layout/aspect ratio.
 - Reviewed extracted frames around dialog opening, text entry, result visibility, zoom edges and caption placement. CJK captions render correctly on this Windows font stack. Final video playback is tested in real Chromium. No audio track is expected.
 - IAB (the embedded chat browser) did not stream localhost video in this session; standalone Chromium playback passed. This is documented rather than misreported as IAB playback verification.
 

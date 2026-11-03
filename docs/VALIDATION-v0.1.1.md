@@ -23,7 +23,11 @@ Unit tests also cover corrupted/unavailable browser storage, legacy fallback, in
 
 Executed on Windows x64 / Node 24.18.0 on 2026-11-03: type checks, 7 behavior tests, build, full core E2E and the recovery suite all passed. Recovery evidence: `test-results/recovery-1793685920004/results.json`; core E2E: `test-results/e2e-1793685920946/results.json`. Recovery screenshots and the exported CJK-caption poster were inspected. No browser page errors; source hashes unchanged. The screenshot capture now waits for the final video to load before saving the export view.
 
-Linux CI and GitHub release verification follow the publication workflow; consult the actual run and release rather than assuming success from these Windows results.
+The packed Windows build was installed with production dependencies into an isolated directory: CLI reports `0.1.1`, and `doctor` successfully detects Chromium and FFmpeg. This installation reused existing browser/system dependencies.
+
+[CI run 41588060829](https://github.com/Ray0766/demopilot/actions/runs/41588060829) passed on Linux with both Node 22 and 24, including core E2E and recovery. The release job also passed its core E2E and self-recording showcase.
+
+[v0.1.1](https://github.com/Ray0766/demopilot/releases/tag/v0.1.1) is public. The fetched tag resolves to `0255a145d15acd327e57734b65486e2d75c2a22c`. The publicly downloaded package (144,891 bytes), fetched showcase MP4 (678,330 bytes) and GIF (1,659,145 bytes) match the release's SHA-256 digests. Local receipt: `test-results/release-v0.1.1-receipt.json`. This is a GitHub release package, not an npm registry publication.
 
 ## Boundaries
 
