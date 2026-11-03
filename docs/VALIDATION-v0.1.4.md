@@ -29,7 +29,9 @@ The final core regression includes the secondary-text contrast and narrow-title 
 
 ## Release status
 
-Publication and public-package verification are pending. This section is updated only after checking the remote commit, CI and downloaded release artifacts.
+[GitHub Actions run 41614627452](https://github.com/Ray0766/demopilot/actions/runs/41614627452) passed Linux Node 22/24 core and recovery checks plus the release job. [v0.1.4](https://github.com/Ray0766/demopilot/releases/tag/v0.1.4) is public; fetch verified tag `9fd4002d88ba2a05d9122613cd8999d1f7b4b7f9`.
+
+The downloaded package (343,274 bytes), MP4 (765,822 bytes) and GIF (1,288,750 bytes) match their published SHA-256 digests and sizes. Receipt: `test-results/release-v0.1.4-receipt.json`. The public video decodes, and the final Linux Studio screenshot was opened for inspection. The downloaded public package installs with production dependencies in `test-results/public-package-v014`; CLI reports 0.1.4 and doctor reports readiness using existing browser/system dependencies. The package is a GitHub release asset, not an npm registry publication.
 
 ## Limits
 
