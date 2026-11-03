@@ -43,7 +43,9 @@ node dist/server/cli.js record demo.recipe.json --output output/my-demo
 node dist/server/cli.js render <recording-id> demo.recipe.json --output output/revised
 ```
 
-录制 ID 会打印在终端。可从 Studio 导入/下载配方、打开历史录制。当前编辑草稿保存在浏览器本地存储；需要跨机器或版本管理时请下载配方。
+录制 ID 会打印在终端。可从 Studio 导入/下载配方、打开历史录制。v0.1.1 会在刷新页面或重启 Studio 后恢复当前录制、编辑草稿和上次导出，切换历史录制也会保留各自编辑。未导出的修改会继续标为待导出。源素材缺失时明确要求复录，不自动替换成别的录像。
+
+草稿保存在同一浏览器、同一 Studio 地址（含端口）的本地存储；清除浏览器存储、换浏览器或跨机器前请下载配方。正在运行的任务和撤销历史不会在刷新后恢复。
 
 目标示例：`role:button:New project`、`label:Project name`、`text:Project created`、`testid:save-button` 或 CSS `#save`。异步操作通过 `waitFor` 指定结果元素；不以猜测的固定延迟代替状态判断。
 

@@ -14,7 +14,7 @@ import { run, ffmpeg, ffprobe } from "./process.js";
 const program = new Command()
   .name("demopilot")
   .description("Turn repeatable browser workflows into polished demo videos.")
-  .version("0.1.0");
+  .version("0.1.1");
 const progress = (message: string) => console.log(message);
 const dataRoot = () => path.resolve(".demopilot");
 function abortOnExit() {

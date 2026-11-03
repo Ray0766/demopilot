@@ -33,6 +33,7 @@ import {
   type Step,
 } from "../shared/schema";
 import { exampleRecipe } from "../shared/example";
+import { readWorkspace, saveWorkspace, restoreExport } from "./workspace";
 
 const bytes = (size: number) => `${(size / 1024 / 1024).toFixed(1)} MB`;
 const seconds = (size: number) => `${size.toFixed(1)}s`;
@@ -47,18 +48,17 @@ const actionLabels = {
   select: "Select option",
 };
 
-function readSaved() {
-  try {
-    const raw = localStorage.getItem("demopilot.recipe");
-    return raw ? recipeSchema.parse(JSON.parse(raw)) : null;
-  } catch {
-    return null;
-  }
-}
-
 export function App() {
+  const [savedWorkspace] = useState(() => {
+    try {
+      return readWorkspace(localStorage);
+    } catch {
+      return null;
+    }
+  });
+  const drafts = useRef(savedWorkspace?.drafts || {});
   const [recipe, setRecipe] = useState<Recipe>(
-    () => readSaved() || exampleRecipe(location.origin),
+    () => savedWorkspace?.recipe || exampleRecipe(location.origin),
   );
   const [selected, setSelected] = useState(0);
   const [token, setToken] = useState("");
@@ -73,10 +73,13 @@ export function App() {
   const [view, setView] = useState<"cut" | "source">("cut");
   const [time, setTime] = useState(0);
   const [history, setHistory] = useState<Recipe[]>([]);
+  const [opening, setOpening] = useState(true);
+  const [storageWarning, setStorageWarning] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const step = recipe.steps[selected] || recipe.steps[0];
-  const busy = job?.status === "running";
+  const running = job?.status === "running";
+  const busy = opening || running;
   const matches = recording
     ? captureIdentity(recording.recipe) === captureIdentity(recipe)
     : false;
@@ -86,6 +89,7 @@ export function App() {
   const scene = recording?.scenes.find((item) => item.stepId === step.id);
 
   useEffect(() => {
+    let active = true;
     fetch("/api/bootstrap")
       .then(async (response) => {
         if (!response.ok)
@@ -94,20 +98,74 @@ export function App() {
           );
         return response.json();
       })
-      .then((data) => {
-        setToken(data.token);
+      .then(async (data) => {
+        if (!active) return;
         setRecordings(data.recordings);
-        if (!readSaved()) setRecipe(data.example);
+        if (!savedWorkspace) setRecipe(data.example);
+        // Older versions stored only the recipe. Match that draft by actions,
+        // but never silently substitute footage for a missing explicit ID.
+        const item: Recording | undefined = savedWorkspace?.recordingId
+          ? data.recordings.find(
+              (item: Recording) => item.id === savedWorkspace.recordingId,
+            )
+          : savedWorkspace?.legacy &&
+            data.recordings.find(
+              (item: Recording) =>
+                captureIdentity(item.recipe) ===
+                captureIdentity(savedWorkspace.recipe),
+            );
+        if (item) {
+          setRecording(item);
+          setView("source");
+          const exportId = drafts.current[item.id]?.exportId;
+          if (exportId) {
+            try {
+              const result = await restoreExport(exportId, item.id);
+              if (!active) return;
+              setOutput(result);
+              setView("cut");
+            } catch (cause) {
+              if (active) setNotice((cause as Error).message);
+            }
+          }
+        } else if (savedWorkspace?.recordingId) {
+          setNotice(
+            "The saved recording is unavailable. Your edits are safe; record again to capture new footage.",
+          );
+        }
+        if (active) setToken(data.token);
       })
-      .catch((cause) => setError(cause.message));
+      .catch((cause) => {
+        if (active) setError(cause.message);
+      })
+      .finally(() => {
+        if (active) setOpening(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
   useEffect(() => {
+    if (opening || !token) return;
+    if (recording)
+      drafts.current = {
+        ...drafts.current,
+        [recording.id]: { recipe, exportId: output?.id || null },
+      };
     try {
-      localStorage.setItem("demopilot.recipe", JSON.stringify(recipe));
+      const saved = saveWorkspace(
+        localStorage,
+        recipe,
+        recording?.id || null,
+        output,
+        drafts.current,
+      );
+      drafts.current = saved.drafts;
+      setStorageWarning(false);
     } catch {
-      /* Recipe download remains available. */
+      setStorageWarning(true);
     }
-  }, [recipe]);
+  }, [recipe, recording, output, opening, token]);
   useEffect(() => {
     if (!help) return;
     const previous = document.activeElement as HTMLElement | null;
@@ -192,6 +250,34 @@ export function App() {
         item.id === step.id ? { ...item, ...patch } : item,
       ),
     });
+  }
+  async function openRecording(item: Recording) {
+    setOpening(true);
+    setError("");
+    setNotice("");
+    const draft = drafts.current[item.id];
+    // An imported recipe can reconnect to matching footage without losing edits.
+    const next =
+      !recording && captureIdentity(recipe) === captureIdentity(item.recipe)
+        ? recipe
+        : draft?.recipe || item.recipe;
+    setRecording(item);
+    setRecipe(next);
+    setHistory([]);
+    setSelected(0);
+    setOutput(null);
+    setView("source");
+    setTime(0);
+    try {
+      if (draft?.exportId) {
+        setOutput(await restoreExport(draft.exportId, item.id));
+        setView("cut");
+      }
+    } catch (cause) {
+      setNotice((cause as Error).message);
+    } finally {
+      setOpening(false);
+    }
   }
   async function api(url: string, body: unknown) {
     const response = await fetch(url, {
@@ -306,7 +392,11 @@ export function App() {
               change({ ...recipe, title: event.target.value })
             }
           />
-          <span className="saved-label">Local draft</span>
+          <span className="saved-label">
+            {storageWarning
+              ? "Draft not saved · download recipe"
+              : "Local draft"}
+          </span>
         </div>
         <div className="project-actions">
           <button
@@ -879,7 +969,12 @@ export function App() {
             <p>Frame the story. Keep the focus.</p>
           </div>
           <div className="primary-actions">
-            {busy ? (
+            {opening ? (
+              <button className="primary" disabled>
+                <LoaderCircle size={17} className="spin" />
+                Opening saved work…
+              </button>
+            ) : running ? (
               <>
                 <button className="primary recording-button" disabled>
                   <LoaderCircle size={17} className="spin" />
@@ -1044,13 +1139,7 @@ export function App() {
                   const item = recordings.find(
                     (item) => item.id === event.target.value,
                   );
-                  if (item) {
-                    setRecording(item);
-                    change(item.recipe);
-                    setSelected(0);
-                    setOutput(null);
-                    setView("source");
-                  }
+                  if (item) void openRecording(item);
                 }}
               >
                 <option value="" disabled>
@@ -1079,7 +1168,7 @@ export function App() {
       </main>
       <footer className="status-bar" aria-live="polite">
         <span>
-          {busy ? (
+          {running ? (
             <>
               <LoaderCircle size={14} className="spin" />
               {job.message}
@@ -1091,7 +1180,7 @@ export function App() {
             </>
           )}
         </span>
-        {busy ? (
+        {running ? (
           <progress value={job.progress} max="1" aria-label="Job progress" />
         ) : (
           <span>DemoPilot 0.1 · Local studio</span>

@@ -6,11 +6,11 @@
 
 ![A real browser workflow recorded and rendered by DemoPilot](docs/media/demo.gif)
 
-[Watch DemoPilot record and edit its own demo (22 s)](docs/media/showcase.mp4) · [Download the first release](https://github.com/Ray0766/demopilot/releases/latest)
+[Watch DemoPilot record and edit its own demo (22 s)](docs/media/showcase.mp4) · [Download the latest release](https://github.com/Ray0766/demopilot/releases/latest)
 
 **DemoPilot is a local recording and editing studio for developers shipping browser apps.** Give it a URL and explicit steps. It operates Chromium, records the real page, and turns the footage into a release video and a short README animation. Save the recipe alongside your code and record it again when the app changes.
 
-**v0.1.0:** a working first release. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
+**v0.1.1:** a local recording and editing studio with draft recovery across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
 
 ## Try it
 
@@ -81,7 +81,7 @@ node dist/server/cli.js record demo.recipe.json --output output/my-demo
 node dist/server/cli.js render <recording-id> demo.recipe.json --output output/revised
 ```
 
-Recording IDs are printed in the terminal. Recordings live in `.demopilot/recordings/`; exports in `.demopilot/exports/`, relative to your current directory. Studio can reopen previous recordings. Download the recipe before clearing browser storage, which stores your current editing draft.
+Recording IDs are printed in the terminal. Recordings live in `.demopilot/recordings/`; exports in `.demopilot/exports/`, relative to your current directory. Studio restores the selected recording, its draft and last export after reload. Each recording keeps its own edits when you switch takes. Unexported changes remain labeled as pending. Drafts use browser storage for the same Studio address; download the recipe before clearing storage or changing browsers/ports.
 
 For a GitHub README, copy the GIF into your repository and add:
 
@@ -107,6 +107,7 @@ npm run check      # TypeScript
 npm test           # validation, timeline, identity and cancellation checks
 npm run build
 npm run test:e2e   # real browser recordings, editing, exports and UI
+npm run test:recovery # reload, switch takes, restart and missing-file recovery
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). New issues should include a small synthetic recipe, expected behavior and tool versions. The repeatable workflow is the priority; this is not a general-purpose video editor.

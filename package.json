@@ -1,6 +1,6 @@
 {
   "name": "@ray0766/demopilot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Repeatable browser workflows. Release-ready demo videos.",
   "type": "module",
   "license": "MIT",
@@ -32,6 +32,7 @@
     "check": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "test:e2e": "tsx tests/e2e.ts",
+    "test:recovery": "tsx tests/recovery.ts",
     "demo": "node dist/server/cli.js demo",
     "doctor": "tsx src/server/cli.ts doctor",
     "prepack": "npm run build",

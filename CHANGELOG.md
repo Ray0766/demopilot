@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 — 2026-11-03
+
+- Fix draft recovery after reload: keep the recording association, unexported edits and the last completed export.
+- Keep independent editing drafts when switching recordings; retain edits when recording another take.
+- Preserve incomplete text edits and migrate v0.1.0 drafts. Missing exports/recordings and failed connections do not silently discard edits or substitute footage.
+- Add real-browser regression coverage for reloads, process restart, switching takes and missing media.
+
 ## 0.1.0 — 2026-11-03
 
 First runnable release of DemoPilot.

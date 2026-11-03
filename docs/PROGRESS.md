@@ -18,3 +18,11 @@
 - Fetched and verified release commit `3dea89de3ab00099d22c64df432f21852c11af8f` and tag `v0.1.0`. Public media SHA-256 matches the release asset digests. Updated repository description, topics and release link.
 - Preserved the Windows-validated commits and media on local branch `local/validated-windows`; current `main` tracks the published repository. Source recordings and raw test evidence remain in ignored local directories.
 - Delivery complete. Unverified limits remain explicit in VALIDATION.md; no competitor or manual productivity advantage is claimed.
+
+## v0.1.1 continuation — 2026-11-03
+
+- Fetched origin/main; no intervening source changes or open issues. Reproduced a core workflow gap: reloading detached an edited draft from footage, and reopening the take reset its recipe.
+- Kept the architecture and UI layout. Added a versioned local browser workspace, per-recording drafts, export ID recovery, old-draft migration and explicit missing-media handling.
+- Initial real-browser recovery run passed for reload, independent takes, rerender, process restart and missing media (`test-results/recovery-1793685710150`). Added connection-failure preservation before the final regression run.
+- Final Windows checks passed: type check, 7 behavior tests, build, core E2E (`test-results/e2e-1793685920946`) and recovery (`test-results/recovery-1793685920004`), including failed-connection preservation. Reviewed recovery screenshots and the final CJK-caption poster; source WebM hashes remain unchanged.
+- Next: publish v0.1.1, wait for Linux CI, fetch and verify release artifacts.

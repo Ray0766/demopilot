@@ -68,9 +68,17 @@ Source clips include result waiting. Automatic trimming retains the action plus 
 
 FFmpeg composes each scene, joins the clips, normalizes to constant 30 fps, and creates the GIF from that final MP4. The player's final cut is the actual downloaded file. There is no live approximation of an unrendered edit. A new export gets a new directory; prior source material stays intact.
 
+## Resume an editing session
+
+Studio saves each recording's editable recipe and last export ID in browser storage. Reloading the page or restarting Studio at the same address restores the current draft and footage. Switching **Previous recordings** restores that take's edits, rather than resetting captions to the recipe captured with it. Unexported edits remain pending; restored downloads still refer to the last actual export.
+
+If an export was removed, the draft stays available for another export. If source footage was removed, record again; Studio does not silently substitute another take. A draft from v0.1.0 can reconnect to the latest recording with matching actions. Saved drafts can contain incomplete text edits, but recording and exporting still require a valid recipe.
+
+This recovery uses the same browser profile and exact Studio address (including port). Clearing browser storage removes drafts, so use **Save recipe** for a portable backup. Source media and completed exports remain on disk. Running jobs and undo history are not resumed after a reload.
+
 ## CLI commands
 
-Use `node dist/server/cli.js` from a source checkout. A release package installed via `npm install -g ./ray0766-demopilot-0.1.0.tgz` also exposes `demopilot`.
+Use `node dist/server/cli.js` from a source checkout. A release package installed via `npm install -g ./ray0766-demopilot-0.1.1.tgz` also exposes `demopilot`.
 
 ```text
 demopilot studio [--port 4310]
