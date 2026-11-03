@@ -11,9 +11,10 @@ export function exampleRecipe(origin = "http://127.0.0.1:4310"): Recipe {
         id: "create",
         action: "click",
         target: "role:button:New project",
+        waitFor: "#dialog",
         caption: "Open the new project form.",
         holdMs: 2200,
-        zoom: 1,
+        zoom: 1.35,
       },
       {
         id: "name",
@@ -31,7 +32,7 @@ export function exampleRecipe(origin = "http://127.0.0.1:4310"): Recipe {
         waitFor: "text:Launch a little sooner",
         caption: "Create the project and find it on the board.",
         holdMs: 2800,
-        zoom: 1,
+        zoom: 1.35,
       },
     ],
   });

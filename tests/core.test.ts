@@ -44,6 +44,7 @@ test("presentation edits preserve capture identity; workflow edits invalidate it
   Object.assign(edit.steps[0], {
     caption: "重新开始",
     zoom: 1.4,
+    focusMode: "target",
     holdMs: 4000,
     trimStart: 0.2,
     trimEnd: 0.1,

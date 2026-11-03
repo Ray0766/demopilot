@@ -1,0 +1,638 @@
+{
+  "date": "2026-11-03",
+  "baselineCommit": "a8d6ace77095dad86e19703ca3e9074044dafbc1",
+  "productVersion": "0.1.4",
+  "environment": {
+    "os": "Windows 10.0.26300",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285K",
+    "node": "v24.18.0",
+    "playwright": "1.64.1",
+    "chromium": "156.0.8078.4",
+    "ffmpeg": "8.1",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "driver": "610.88"
+  },
+  "scope": "Isolated synthetic fixtures; no production changes, paid model calls or external user actions.",
+  "versions": [
+    {
+      "name": "mediabunny",
+      "version": "1.65.0",
+      "date": "2026-10-30T17:29:03.798Z",
+      "license": "MPL-2.0",
+      "dependencies": {
+        "@types/dom-webcodecs": "0.1.13",
+        "@types/dom-mediacapture-transform": "^0.1.11"
+      },
+      "unpackedSize": 11343554,
+      "source": {
+        "url": "git+https://github.com/Vanilagy/mediabunny.git",
+        "type": "git"
+      }
+    },
+    {
+      "name": "@remotion/player",
+      "version": "4.0.540",
+      "date": "2026-11-02T08:30:50.777Z",
+      "license": "SEE LICENSE IN LICENSE.md",
+      "dependencies": {
+        "remotion": "4.0.540"
+      },
+      "unpackedSize": 344724,
+      "source": {
+        "url": "https://github.com/remotion-dev/remotion/tree/main/packages/player"
+      }
+    },
+    {
+      "name": "@remotion/web-renderer",
+      "version": "4.0.540",
+      "date": "2026-11-02T08:30:40.778Z",
+      "license": "SEE LICENSE IN LICENSE.md",
+      "dependencies": {
+        "remotion": "4.0.540",
+        "mediabunny": "1.64.0",
+        "@remotion/licensing": "4.0.540",
+        "@mediabunny/aac-encoder": "1.64.0",
+        "@mediabunny/mp3-encoder": "1.64.0",
+        "@mediabunny/flac-encoder": "1.64.0"
+      },
+      "unpackedSize": 294073,
+      "source": {
+        "url": "https://github.com/remotion-dev/remotion/tree/main/packages/web-renderer"
+      }
+    },
+    {
+      "name": "@browserbasehq/stagehand",
+      "version": "4.3.0",
+      "date": "2026-10-20T00:40:20.973Z",
+      "license": "MIT",
+      "dependencies": {
+        "zod": "4.4.3",
+        "@browserbasehq/sdk": "^2.16.0",
+        "@opentelemetry/api": "1.9.1",
+        "@opentelemetry/core": "2.9.0"
+      },
+      "unpackedSize": 3580794,
+      "source": {
+        "url": "git+https://github.com/browserbase/stagehand.git",
+        "type": "git",
+        "directory": "packages/sdk-ts"
+      }
+    }
+  ],
+  "sourceFiles": [
+    {
+      "name": "recording.json",
+      "bytes": 2321,
+      "sha256": "a2a871ef32505bf46321f13f5d3971209abfac22e8847fedfbcdab8676212aab"
+    },
+    {
+      "name": "0.webm",
+      "bytes": 288621,
+      "sha256": "71c7dba3b39f671fe92e5d2ee10bd875e2925a534465340435bbf5251e82b2ae"
+    },
+    {
+      "name": "1.webm",
+      "bytes": 255803,
+      "sha256": "afec26cd352f3eb0b50b69610704ce9517fa90eed0c7d0a12bcbb4bcec9c6d58"
+    },
+    {
+      "name": "2.webm",
+      "bytes": 361877,
+      "sha256": "ff6c898f7b780138fa6aab3a7d54d71b400c44cfd25a3d0cd690797e5f4c9784"
+    }
+  ],
+  "readiness": [
+    {
+      "trial": 0,
+      "preflight": false,
+      "preparationMs": 42.88920000000002,
+      "actionWaitMs": 1361.4032000000002,
+      "clipWallMs": 2363.4159,
+      "result": "Saved",
+      "clickCount": 1,
+      "media": {
+        "duration": 3.833,
+        "width": 640,
+        "height": 480,
+        "codec": "vp9",
+        "fps": "30/1"
+      }
+    },
+    {
+      "trial": 0,
+      "preflight": true,
+      "preparationMs": 1963.9030000000002,
+      "actionWaitMs": 30.46680000000015,
+      "clipWallMs": 1021.6528000000008,
+      "result": "Saved",
+      "clickCount": 1,
+      "media": {
+        "duration": 1.933,
+        "width": 640,
+        "height": 480,
+        "codec": "vp9",
+        "fps": "30/1"
+      }
+    },
+    {
+      "trial": 1,
+      "preflight": false,
+      "preparationMs": 39.274999999999636,
+      "actionWaitMs": 1382.0799000000006,
+      "clipWallMs": 2373.2443999999996,
+      "result": "Saved",
+      "clickCount": 1,
+      "media": {
+        "duration": 3.833,
+        "width": 640,
+        "height": 480,
+        "codec": "vp9",
+        "fps": "30/1"
+      }
+    },
+    {
+      "trial": 1,
+      "preflight": true,
+      "preparationMs": 1927.9431000000004,
+      "actionWaitMs": 20.546700000000783,
+      "clipWallMs": 1005.8035,
+      "result": "Saved",
+      "clickCount": 1,
+      "media": {
+        "duration": 1.933,
+        "width": 640,
+        "height": 480,
+        "codec": "vp9",
+        "fps": "30/1"
+      }
+    },
+    {
+      "trial": 2,
+      "preflight": false,
+      "preparationMs": 53.08019999999851,
+      "actionWaitMs": 1377.8425000000007,
+      "clipWallMs": 2375.9081000000006,
+      "result": "Saved",
+      "clickCount": 1,
+      "media": {
+        "duration": 3.833,
+        "width": 640,
+        "height": 480,
+        "codec": "vp9",
+        "fps": "30/1"
+      }
+    },
+    {
+      "trial": 2,
+      "preflight": true,
+      "preparationMs": 1934.5143000000007,
+      "actionWaitMs": 25.87619999999879,
+      "clipWallMs": 1018.9061000000002,
+      "result": "Saved",
+      "clickCount": 1,
+      "media": {
+        "duration": 1.933,
+        "width": 640,
+        "height": 480,
+        "codec": "vp9",
+        "fps": "30/1"
+      }
+    }
+  ],
+  "frameRates": [
+    {
+      "requestedFps": 30,
+      "media": {
+        "duration": 3.4,
+        "width": 1280,
+        "height": 800,
+        "codec": "vp9",
+        "fps": "30/1"
+      },
+      "bytes": 98537,
+      "frames": 102,
+      "distinctFrames": 102
+    },
+    {
+      "requestedFps": 60,
+      "media": {
+        "duration": 3.4,
+        "width": 1280,
+        "height": 800,
+        "codec": "vp9",
+        "fps": "60/1"
+      },
+      "bytes": 187687,
+      "frames": 204,
+      "distinctFrames": 204
+    }
+  ],
+  "render": {
+    "method": "Three alternating x264 fast CRF20 / h264_nvenc p4 VBR CQ20 pairs. Full scene composition, concat reencode, GIF and poster. Quality settings are not equivalent.",
+    "rows": [
+      {
+        "trial": 0,
+        "encoder": "x264",
+        "elapsedMs": 3815.703,
+        "events": [
+          {
+            "message": "Composing scene 1/3…",
+            "elapsedMs": 0.741
+          },
+          {
+            "message": "Composing scene 2/3…",
+            "elapsedMs": 465.443
+          },
+          {
+            "message": "Composing scene 3/3…",
+            "elapsedMs": 946.57
+          },
+          {
+            "message": "Joining the final cut…",
+            "elapsedMs": 1534.551
+          },
+          {
+            "message": "Making the README GIF…",
+            "elapsedMs": 2482.628
+          },
+          {
+            "message": "MP4 and GIF are ready.",
+            "elapsedMs": 3815.68
+          }
+        ],
+        "duration": 10.966667,
+        "bytes": {
+          "mp4": 226913,
+          "gif": 1215248
+        },
+        "localExportId": "7e196248-0487-480f-8c91-6d3f4b9d28b8"
+      },
+      {
+        "trial": 0,
+        "encoder": "nvenc",
+        "elapsedMs": 3314.228,
+        "events": [
+          {
+            "message": "Composing scene 1/3…",
+            "elapsedMs": 0.708
+          },
+          {
+            "message": "Composing scene 2/3…",
+            "elapsedMs": 454.956
+          },
+          {
+            "message": "Composing scene 3/3…",
+            "elapsedMs": 879.728
+          },
+          {
+            "message": "Joining the final cut…",
+            "elapsedMs": 1340.859
+          },
+          {
+            "message": "Making the README GIF…",
+            "elapsedMs": 1934.27
+          },
+          {
+            "message": "MP4 and GIF are ready.",
+            "elapsedMs": 3314.215
+          }
+        ],
+        "duration": 10.966667,
+        "bytes": {
+          "mp4": 481074,
+          "gif": 1864011
+        },
+        "localExportId": "cab75d59-32d2-48da-946c-6eceda16c88d"
+      },
+      {
+        "trial": 1,
+        "encoder": "x264",
+        "elapsedMs": 3755.034,
+        "events": [
+          {
+            "message": "Composing scene 1/3…",
+            "elapsedMs": 0.431
+          },
+          {
+            "message": "Composing scene 2/3…",
+            "elapsedMs": 446.186
+          },
+          {
+            "message": "Composing scene 3/3…",
+            "elapsedMs": 923.874
+          },
+          {
+            "message": "Joining the final cut…",
+            "elapsedMs": 1471.639
+          },
+          {
+            "message": "Making the README GIF…",
+            "elapsedMs": 2410.066
+          },
+          {
+            "message": "MP4 and GIF are ready.",
+            "elapsedMs": 3755.018
+          }
+        ],
+        "duration": 10.966667,
+        "bytes": {
+          "mp4": 226913,
+          "gif": 1215248
+        },
+        "localExportId": "ad05f5b3-68e2-4a9d-b76d-969d746b86fb"
+      },
+      {
+        "trial": 1,
+        "encoder": "nvenc",
+        "elapsedMs": 3302.293,
+        "events": [
+          {
+            "message": "Composing scene 1/3…",
+            "elapsedMs": 0.339
+          },
+          {
+            "message": "Composing scene 2/3…",
+            "elapsedMs": 423.012
+          },
+          {
+            "message": "Composing scene 3/3…",
+            "elapsedMs": 848.351
+          },
+          {
+            "message": "Joining the final cut…",
+            "elapsedMs": 1307.002
+          },
+          {
+            "message": "Making the README GIF…",
+            "elapsedMs": 1908.796
+          },
+          {
+            "message": "MP4 and GIF are ready.",
+            "elapsedMs": 3302.273
+          }
+        ],
+        "duration": 10.966667,
+        "bytes": {
+          "mp4": 481074,
+          "gif": 1864011
+        },
+        "localExportId": "b1eaf5e7-cecb-4f43-b986-735fefb7db77"
+      },
+      {
+        "trial": 2,
+        "encoder": "x264",
+        "elapsedMs": 3744.033,
+        "events": [
+          {
+            "message": "Composing scene 1/3…",
+            "elapsedMs": 0.38
+          },
+          {
+            "message": "Composing scene 2/3…",
+            "elapsedMs": 452.631
+          },
+          {
+            "message": "Composing scene 3/3…",
+            "elapsedMs": 933.912
+          },
+          {
+            "message": "Joining the final cut…",
+            "elapsedMs": 1474.962
+          },
+          {
+            "message": "Making the README GIF…",
+            "elapsedMs": 2409.39
+          },
+          {
+            "message": "MP4 and GIF are ready.",
+            "elapsedMs": 3744.017
+          }
+        ],
+        "duration": 10.966667,
+        "bytes": {
+          "mp4": 226913,
+          "gif": 1215248
+        },
+        "localExportId": "3402641c-9909-4ab9-836a-f3e4d635178b"
+      },
+      {
+        "trial": 2,
+        "encoder": "nvenc",
+        "elapsedMs": 3295.493,
+        "events": [
+          {
+            "message": "Composing scene 1/3…",
+            "elapsedMs": 0.361
+          },
+          {
+            "message": "Composing scene 2/3…",
+            "elapsedMs": 424.805
+          },
+          {
+            "message": "Composing scene 3/3…",
+            "elapsedMs": 839.714
+          },
+          {
+            "message": "Joining the final cut…",
+            "elapsedMs": 1301.681
+          },
+          {
+            "message": "Making the README GIF…",
+            "elapsedMs": 1900.424
+          },
+          {
+            "message": "MP4 and GIF are ready.",
+            "elapsedMs": 3295.477
+          }
+        ],
+        "duration": 10.966667,
+        "bytes": {
+          "mp4": 481074,
+          "gif": 1864011
+        },
+        "localExportId": "777b9aed-dcaf-44b2-94fc-5a443fdd7049"
+      }
+    ],
+    "medians": {
+      "x264": 3755.034,
+      "nvenc": 3302.293
+    }
+  },
+  "caption": {
+    "inputCharacters": 160,
+    "wrappedLines": 5,
+    "renderedLines": 4,
+    "renderedCharacters": 128
+  },
+  "seek": {
+    "method": "30 local WebM seeks per engine, three rounds, alternating engine order, HTTP range support. Native waits for requestVideoFrameCallback then Canvas draw; Mediabunny waits for CanvasSink then Canvas draw. Different presentation pipelines, not a pure decoder-speed test. Warm short-file trial only.",
+    "discardedPilot": "seek-results.json excluded: no HTTP range support and seeked event did not establish actual presented frames.",
+    "samplesPerEngine": 90,
+    "sourceDuration": 4.733,
+    "rounds": [
+      {
+        "round": 0,
+        "native": {
+          "p50": 44.2,
+          "p95": 55.7,
+          "maxTimestampErrorMs": 33
+        },
+        "mediabunny": {
+          "p50": 37.2,
+          "p95": 60.2,
+          "maxTimestampErrorMs": 0
+        }
+      },
+      {
+        "round": 1,
+        "native": {
+          "p50": 46.3,
+          "p95": 69.6,
+          "maxTimestampErrorMs": 33
+        },
+        "mediabunny": {
+          "p50": 39.1,
+          "p95": 62,
+          "maxTimestampErrorMs": 0
+        }
+      },
+      {
+        "round": 2,
+        "native": {
+          "p50": 48,
+          "p95": 62.9,
+          "maxTimestampErrorMs": 33
+        },
+        "mediabunny": {
+          "p50": 40.8,
+          "p95": 68.7,
+          "maxTimestampErrorMs": 0
+        }
+      }
+    ],
+    "errors": []
+  },
+  "verification": {
+    "verified": [
+      {
+        "encoder": "x264",
+        "format": "mp4",
+        "media": {
+          "duration": 10.966667,
+          "width": 1280,
+          "height": 900,
+          "codec": "h264",
+          "fps": "30/1"
+        },
+        "fullDecode": true
+      },
+      {
+        "encoder": "x264",
+        "format": "gif",
+        "media": {
+          "duration": 11,
+          "width": 800,
+          "height": 563,
+          "codec": "gif",
+          "fps": "25/2"
+        },
+        "fullDecode": true
+      },
+      {
+        "encoder": "nvenc",
+        "format": "mp4",
+        "media": {
+          "duration": 10.966667,
+          "width": 1280,
+          "height": 900,
+          "codec": "h264",
+          "fps": "30/1"
+        },
+        "fullDecode": true
+      },
+      {
+        "encoder": "nvenc",
+        "format": "gif",
+        "media": {
+          "duration": 11,
+          "width": 800,
+          "height": 563,
+          "codec": "gif",
+          "fps": "25/2"
+        },
+        "fullDecode": true
+      }
+    ],
+    "semantic": {
+      "before": [
+        {
+          "role": "main",
+          "name": "Demo",
+          "box": {
+            "x": 8,
+            "y": 8,
+            "width": 624,
+            "height": 21
+          },
+          "children": [
+            {
+              "role": "button",
+              "name": "Create project",
+              "box": {
+                "x": 8,
+                "y": 8,
+                "width": 100,
+                "height": 21
+              }
+            }
+          ]
+        }
+      ],
+      "after": [
+        {
+          "role": "main",
+          "name": "Demo",
+          "box": {
+            "x": 8,
+            "y": 8,
+            "width": 624,
+            "height": 42
+          },
+          "children": [
+            {
+              "role": "button",
+              "name": "Create project",
+              "disabled": true,
+              "box": {
+                "x": 8,
+                "y": 8,
+                "width": 100,
+                "height": 21
+              }
+            },
+            {
+              "role": "status",
+              "box": {
+                "x": 8,
+                "y": 29,
+                "width": 624,
+                "height": 21
+              },
+              "text": "Project created"
+            }
+          ]
+        }
+      ],
+      "beforeMs": 15.131900000000087,
+      "afterMs": 2.490099999999984
+    }
+  },
+  "limitations": [
+    "One Windows desktop and short synthetic recordings; no cross-platform or long-file claim.",
+    "All readiness runs succeeded; no stability success-rate improvement measured.",
+    "NVENC settings not quality-matched; single-frame visual inspection cannot establish equivalent quality.",
+    "No user study, real editor responsiveness benchmark or preview/export pixel-parity validation.",
+    "Prototype scripts and original media retained locally under test-results/tech-research-20261103; this JSON is a portable evidence summary."
+  ]
+}

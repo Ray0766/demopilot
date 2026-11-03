@@ -11,6 +11,8 @@ import path from "node:path";
 import os from "node:os";
 import { createHash } from "node:crypto";
 import { chromium } from "playwright";
+import sharp from "sharp";
+import { checkEditedPlayback } from "./preview-checks.js";
 import { capture } from "../src/server/capture.js";
 import { render } from "../src/server/render.js";
 import { run, ffmpeg, probe, pause } from "../src/server/process.js";
@@ -73,6 +75,13 @@ try {
     first.scenes.map((s) => s.stepId),
   );
   assert.equal(third.recipe.steps[0].caption, edited.steps[0].caption);
+  for (const take of [first, second, third]) {
+    assert.ok(
+      take.scenes[0].targetBox && take.scenes[0].result,
+      "record the action and explicit result rectangles",
+    );
+    assert.ok(take.scenes[2].result, "record the created project result");
+  }
   const hash = async (file: string) =>
     createHash("sha256")
       .update(await readFile(file))
@@ -124,8 +133,48 @@ try {
     path.join(itemPath(root, "recordings", first.id), "0.webm"),
   );
   const original = await render(first, recipe, root, signal, log);
+  assert.equal(original.cache?.misses, 3);
+  const reused = await render(first, recipe, root, signal, log);
+  assert.deepEqual([reused.cache?.hits, reused.cache?.misses], [3, 0]);
+  const longCaption = "中".repeat(128) + "文".repeat(28) + "完整结尾";
+  const captionEdit = structuredClone(recipe);
+  captionEdit.steps[0].caption = longCaption;
+  const captionOnly = await render(first, captionEdit, root, signal, log);
+  assert.deepEqual(
+    [captionOnly.cache?.hits, captionOnly.cache?.misses],
+    [2, 1],
+  );
+  const damagedPath = path.join(
+    root,
+    "cache",
+    "scenes",
+    `${captionOnly.cache!.scenes[1].key}.mp4`,
+  );
+  const damaged = await readFile(damagedPath);
+  damaged[100] ^= 0xff;
+  await writeFile(damagedPath, damaged);
+  const repaired = await render(first, captionEdit, root, signal, log);
+  assert.deepEqual(
+    [repaired.cache?.hits, repaired.cache?.misses],
+    [2, 1],
+    "same-size cache corruption must rebuild just that scene",
+  );
+  assert.deepEqual(
+    repaired.cache?.scenes.map((scene) => scene.reused),
+    [true, false, true],
+  );
+  results.sceneCache = {
+    unchanged: reused.cache,
+    oneCaption: captionOnly.cache,
+    damagedEntry: repaired.cache,
+  };
   edited.template = "paper";
   const updated = await render(first, edited, root, signal, log);
+  assert.equal(
+    updated.cache?.misses,
+    3,
+    "a global template change invalidates every scene",
+  );
   assert.equal(
     sourceHash,
     await hash(path.join(itemPath(root, "recordings", first.id), "0.webm")),
@@ -142,7 +191,7 @@ try {
     log,
   );
   assert.ok(midnight.trimmedSeconds > 1.5);
-  for (const output of [original, updated, midnight]) {
+  for (const output of [original, captionOnly, repaired, updated, midnight]) {
     const dir = itemPath(root, "exports", output.id);
     const media = await probe(path.join(dir, "demo.mp4"));
     assert.equal(media.width, 1280);
@@ -175,7 +224,7 @@ try {
   const pendingRender = render(first, recipe, root, renderCancel.signal);
   setTimeout(() => renderCancel.abort(), 250);
   await assert.rejects(pendingRender, /Cancelled|abort/i);
-  assert.equal((await readdir(path.join(root, "exports"))).length, 3);
+  assert.equal((await readdir(path.join(root, "exports"))).length, 6);
   results.editing = {
     offlineRerender: true,
     sourceUnchanged: true,
@@ -291,12 +340,128 @@ try {
       .waitFor({ timeout: 90000 });
     await page
       .getByRole("textbox", { name: "Caption for scene 1", exact: true })
-      .fill("Open the new project form.");
+      .fill(longCaption);
+    await page.waitForFunction(
+      (text) => document.querySelector("canvas")?.dataset.caption === text,
+      longCaption,
+    );
+    const liveTimes: number[] = [];
+    for (let n = 0; n < 8; n++) {
+      const value = `Edit preview ${n}. 字幕即时更新。`;
+      const start = performance.now();
+      await page
+        .getByRole("textbox", { name: "Caption for scene 1", exact: true })
+        .fill(value);
+      await page.waitForFunction(
+        (text) => document.querySelector("canvas")?.dataset.caption === text,
+        value,
+      );
+      liveTimes.push(performance.now() - start);
+    }
+    await page
+      .getByRole("textbox", { name: "Caption for scene 1", exact: true })
+      .fill(longCaption);
+    await page.waitForFunction(
+      (text) => document.querySelector("canvas")?.dataset.caption === text,
+      longCaption,
+    );
+    await page.getByLabel("Preview position", { exact: true }).fill("1.8");
+    await page.waitForFunction(
+      () =>
+        document.querySelector("canvas")?.dataset.time === "1.800" &&
+        !document.querySelector("video")?.seeking,
+    );
+    const livePng = Buffer.from(
+      await page
+        .locator("canvas")
+        .evaluate(
+          (c: HTMLCanvasElement) => c.toDataURL("image/png").split(",")[1],
+        ),
+      "base64",
+    );
+    await writeFile(path.join(root, "live-caption-frame.png"), livePng);
+    await page.screenshot({
+      path: path.join(root, "studio-live-preview.png"),
+      fullPage: true,
+    });
     await page
       .getByRole("button", { name: "Export MP4 + GIF", exact: true })
       .click();
     await page
       .getByRole("link", { name: /Download MP4/ })
+      .waitFor({ timeout: 180000 });
+    const captionExport = await page
+      .getByRole("link", { name: /Download MP4/ })
+      .getAttribute("href");
+    const captionFile = path.join(root, captionExport!.replace("/media/", ""));
+    const encodedFrame = path.join(root, "export-caption-frame.png");
+    await run(ffmpeg(), [
+      "-v",
+      "error",
+      "-y",
+      "-ss",
+      "1.8",
+      "-i",
+      captionFile,
+      "-frames:v",
+      "1",
+      encodedFrame,
+    ]);
+    const difference = async (region?: {
+      left: number;
+      top: number;
+      width: number;
+      height: number;
+    }) => {
+      const pixels = async (input: Buffer | string) => {
+        let img = sharp(input);
+        if (region) img = img.extract(region);
+        return img.removeAlpha().raw().toBuffer();
+      };
+      const [a, b] = await Promise.all([pixels(livePng), pixels(encodedFrame)]);
+      assert.equal(a.length, b.length);
+      return (
+        a.reduce((sum, value, i) => sum + Math.abs(value - b[i]), 0) / a.length
+      );
+    };
+    const captionDifference = await difference({
+      left: 0,
+      top: 800,
+      width: 1280,
+      height: 94,
+    });
+    const frameDifference = await difference();
+    assert.ok(
+      captionDifference < 5,
+      `Caption raster differs from encoded output: ${captionDifference}`,
+    );
+    assert.ok(
+      frameDifference < 8,
+      `Preview geometry/content differs from encoded output: ${frameDifference}`,
+    );
+    results.livePreview = {
+      samplesMs: liveTimes,
+      p95Ms: [...liveTimes].sort((a, b) => a - b).at(-1),
+      captionDifference,
+      frameDifference,
+      originalCharacters: longCaption.length,
+      ending: longCaption.slice(-4),
+    };
+    await writeFile(
+      path.join(root, "preview-results.json"),
+      JSON.stringify(results.livePreview, null, 2),
+    );
+    await page
+      .getByRole("textbox", { name: "Caption for scene 1", exact: true })
+      .fill("Open the new project form.");
+    await page
+      .getByRole("button", { name: "Update export", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Rendering…", exact: true })
+      .waitFor();
+    await page
+      .getByRole("button", { name: "Update export", exact: true })
       .waitFor({ timeout: 180000 });
     const video = page.getByLabel("Final demo video");
     await page
@@ -458,9 +623,16 @@ try {
     );
     assert.ok(
       await captionTwo.evaluate(
-        (el: HTMLTextAreaElement) => el.scrollHeight <= el.clientHeight + 1,
+        (el: HTMLTextAreaElement) =>
+          el.scrollHeight <= el.clientHeight + 1 ||
+          getComputedStyle(el).overflowY === "auto",
       ),
-      "Long captions must expand instead of clipping",
+      "Long captions must remain scrollable without hiding their ending",
+    );
+    await captionTwo.press("Control+End");
+    assert.equal(
+      await captionTwo.evaluate((el: HTMLTextAreaElement) => el.selectionEnd),
+      (await captionTwo.inputValue()).length,
     );
     await page.screenshot({
       path: path.join(root, "studio-long-caption.png"),
@@ -490,6 +662,8 @@ try {
       "Open help",
     );
     assert.deepEqual(errors, []);
+    results.editedPlayback = await checkEditedPlayback(page, slowRecording);
+    assert.deepEqual(errors, []);
     results.ui = {
       recordEditExport: true,
       videoPlayback: true,
@@ -502,7 +676,7 @@ try {
       externalPlaybackControls: true,
       keyboardSeek: true,
       keyboardDisclosures: true,
-      inlineCaptionExpansion: true,
+      longCaptionKeyboardAccess: true,
       narrowTitleExpansion: true,
       bundledFontsLoaded: true,
       noExternalDesignRequests: true,

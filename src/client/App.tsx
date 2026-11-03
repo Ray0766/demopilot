@@ -38,6 +38,7 @@ import {
 } from "../shared/schema";
 import { exampleRecipe } from "../shared/example";
 import { readWorkspace, saveWorkspace, restoreExport } from "./workspace";
+import { CompositionPreview, type PreviewControls } from "./CompositionPreview";
 
 const bytes = (size: number) => `${(size / 1024 / 1024).toFixed(1)} MB`;
 const seconds = (size: number) => `${size.toFixed(1)}s`;
@@ -75,7 +76,7 @@ export function App() {
   const [help, setHelp] = useState(false);
   const [settings, setSettings] = useState(false);
   const [inspector, setInspector] = useState<"scene" | "frame">("scene");
-  const [view, setView] = useState<"cut" | "source">("cut");
+  const [view, setView] = useState<"cut" | "source" | "edit">("cut");
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -85,6 +86,7 @@ export function App() {
   const [storageWarning, setStorageWarning] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const video = useRef<HTMLVideoElement>(null);
+  const editPreview = useRef<PreviewControls>(null);
   const step = recipe.steps[selected] || recipe.steps[0];
   const running = job?.status === "running";
   const busy = opening || running;
@@ -96,7 +98,9 @@ export function App() {
     : false;
   const scene = recording?.scenes.find((item) => item.stepId === step.id);
   const previewAvailable = Boolean(
-    view === "cut" ? output : recording && scene,
+    view === "cut"
+      ? output
+      : recording && scene && (view !== "edit" || matches),
   );
   const videoEvents = {
     onLoadStart: () => {
@@ -118,6 +122,10 @@ export function App() {
       ),
   };
   function togglePlayback() {
+    if (view === "edit") {
+      editPreview.current?.toggle();
+      return;
+    }
     if (!video.current) return;
     if (video.current.paused)
       void video.current
@@ -251,7 +259,7 @@ export function App() {
             setRecording(result);
             setRecordings((items) => [result, ...items]);
             setOutput(null);
-            setView("source");
+            setView("edit");
             setNotice(
               "Recording saved. Adjust the cut, then export your demo.",
             );
@@ -281,6 +289,12 @@ export function App() {
   function change(next: Recipe) {
     setHistory((items) => [...items.slice(-19), structuredClone(recipe)]);
     setRecipe(next);
+    if (recording)
+      setView(
+        captureIdentity(recording.recipe) === captureIdentity(next)
+          ? "edit"
+          : "source",
+      );
     setError("");
     setNotice("");
   }
@@ -730,7 +744,35 @@ export function App() {
                             })
                           }
                         />
-                        <small>Follows the action target</small>
+                        <small>
+                          {step.zoom === 1
+                            ? "1× keeps the whole page in view"
+                            : "Keeps the chosen focus inside the frame"}
+                        </small>
+                      </label>
+                      <label className="field">
+                        <span>Camera focus</span>
+                        <select
+                          aria-label="Camera focus"
+                          aria-describedby="camera-focus-help"
+                          value={step.focusMode || "follow"}
+                          disabled={busy}
+                          onChange={(event) =>
+                            patchStep({
+                              focusMode: event.target
+                                .value as Step["focusMode"],
+                            })
+                          }
+                        >
+                          <option value="follow">Action → result</option>
+                          <option value="target">Action target</option>
+                          <option value="center">Page center</option>
+                        </select>
+                        <small id="camera-focus-help">
+                          {scene?.result
+                            ? "Result position saved with this take"
+                            : "No result position in this take. Uses the action target; set Wait for result and record again to follow it."}
+                        </small>
                       </label>
                       <label className="field">
                         <span>Hold the result</span>
@@ -890,6 +932,14 @@ export function App() {
           <div className="preview-heading">
             <div className="tabs">
               <button
+                aria-pressed={view === "edit"}
+                className={view === "edit" ? "active" : ""}
+                disabled={!matches}
+                onClick={() => setView("edit")}
+              >
+                Edit preview
+              </button>
+              <button
                 aria-pressed={view === "cut"}
                 className={view === "cut" ? "active" : ""}
                 onClick={() => setView("cut")}
@@ -905,7 +955,7 @@ export function App() {
               </button>
             </div>
             <span className="preview-meta">
-              {view === "cut"
+              {view !== "source"
                 ? "1280 × 900"
                 : `${recipe.viewport.width} × ${recipe.viewport.height}`}
               <span />
@@ -925,7 +975,21 @@ export function App() {
                 } as CSSProperties
               }
             >
-              {view === "cut" && output ? (
+              {view === "edit" && recording && scene && matches ? (
+                <CompositionPreview
+                  ref={editPreview}
+                  key={`${recording.id}-${step.id}`}
+                  recording={recording}
+                  recipe={recipe}
+                  index={selected}
+                  token={token}
+                  onState={(state) => {
+                    setTime(state.time);
+                    setDuration(state.duration);
+                    setPlaying(state.playing);
+                  }}
+                />
+              ) : view === "cut" && output ? (
                 <video
                   ref={video}
                   key={output.id}
@@ -1018,7 +1082,8 @@ export function App() {
                   disabled={!duration}
                   onChange={(event) => {
                     const next = Number(event.target.value);
-                    if (video.current) video.current.currentTime = next;
+                    if (view === "edit") editPreview.current?.seek(next);
+                    else if (video.current) video.current.currentTime = next;
                     setTime(next);
                   }}
                 />
@@ -1026,13 +1091,15 @@ export function App() {
             )}
             <span className="preview-status">
               <span className={`status-dot ${recording ? "ready" : ""}`} />
-              {output && view === "cut"
-                ? "Rendered video"
-                : recording && view === "source"
-                  ? `Source · scene ${selected + 1}`
-                  : onSample
-                    ? "Record the sample to start"
-                    : "No recording yet"}
+              {recording && view === "edit" && matches
+                ? `Edit preview · scene ${selected + 1}`
+                : output && view === "cut"
+                  ? "Rendered video"
+                  : recording && view === "source"
+                    ? `Source · scene ${selected + 1}`
+                    : onSample
+                      ? "Record the sample to start"
+                      : "No recording yet"}
             </span>
             <span>
               {previewAvailable
@@ -1079,6 +1146,12 @@ export function App() {
                   const previous = history.at(-1);
                   if (previous) {
                     setRecipe(previous);
+                    if (
+                      recording &&
+                      captureIdentity(recording.recipe) ===
+                        captureIdentity(previous)
+                    )
+                      setView("edit");
                     setSelected(0);
                     setHistory(history.slice(0, -1));
                   }
@@ -1103,7 +1176,7 @@ export function App() {
                     onClick={() => {
                       setSelected(index);
                       setInspector("scene");
-                      if (recording) setView("source");
+                      if (recording) setView(matches ? "edit" : "source");
                     }}
                   >
                     <span className="sequence-number">

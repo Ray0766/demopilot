@@ -5,8 +5,10 @@ import { readFile } from "node:fs/promises";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { recipeSchema } from "../shared/schema.js";
 import { exampleRecipe } from "../shared/example.js";
-import { capture } from "./capture.js";
+import { capture, fingerprint } from "./capture.js";
 import { render } from "./render.js";
+import { makeFrame } from "./frame.js";
+import { scenePlan } from "../shared/composition.js";
 import { listRecordings, loadRecording, itemPath, validId } from "./store.js";
 import { Jobs } from "./jobs.js";
 
@@ -30,11 +32,9 @@ export async function createApp(options: {
   app.disable("x-powered-by");
   app.use((req, res, next) => {
     if (!allowedHosts.has(req.headers.host || ""))
-      return res
-        .status(403)
-        .json({
-          error: "Use the loopback Studio URL printed in your terminal.",
-        });
+      return res.status(403).json({
+        error: "Use the loopback Studio URL printed in your terminal.",
+      });
     const origin = req.headers.origin;
     if (
       origin &&
@@ -98,6 +98,40 @@ export async function createApp(options: {
           render(recording, recipe, options.root, signal, progress),
         ),
       );
+  });
+  let previews = 0;
+  app.post("/api/preview-frame", async (req, res) => {
+    if (previews >= 2)
+      return res
+        .status(429)
+        .json({ error: "Preview is busy. Try again in a moment." });
+    previews++;
+    try {
+      const recipe = recipeSchema.parse(req.body.recipe);
+      const recording = await loadRecording(options.root, req.body.recordingId);
+      const index = req.body.index;
+      if (!Number.isInteger(index) || index < 0 || index >= recipe.steps.length)
+        throw new Error("Choose a valid scene to preview.");
+      if (fingerprint(recipe) !== recording.fingerprint)
+        throw new Error(
+          "The workflow changed. Record again before previewing this edit.",
+        );
+      const scene = recording.scenes[index];
+      if (!scene || scene.stepId !== recipe.steps[index].id)
+        throw new Error(
+          "The scene does not match this recording. Record again.",
+        );
+      const plan = scenePlan(scene, recipe.steps[index], recipe.trimWaiting);
+      const png = await makeFrame(
+        recipe,
+        recipe.steps[index],
+        index,
+        plan.disclosure,
+      );
+      if (!res.destroyed) res.type("png").send(png);
+    } finally {
+      previews--;
+    }
   });
   app.get("/api/jobs/:id", (req, res) => {
     const job = jobs.get(req.params.id);

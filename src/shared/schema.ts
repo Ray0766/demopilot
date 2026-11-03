@@ -32,6 +32,7 @@ export const stepSchema = z
     waitFor: z.string().max(500).default(""),
     holdMs: z.number().int().min(500).max(8000).default(1800),
     zoom: z.number().min(1).max(1.8).default(1),
+    focusMode: z.enum(["follow", "target", "center"]).default("follow"),
     trimStart: z.number().min(0).max(60).default(0),
     trimEnd: z.number().min(0).max(60).default(0),
   })
@@ -107,6 +108,7 @@ export const recipeSchema = z
 export type Recipe = z.infer<typeof recipeSchema>;
 export type Step = z.infer<typeof stepSchema>;
 export type Template = Recipe["template"];
+export type FocusBox = { x: number; y: number; width: number; height: number };
 export type Scene = {
   stepId: string;
   file: string;
@@ -116,6 +118,8 @@ export type Scene = {
   readyAt: number;
   preWaitMs: number;
   focus: { x: number; y: number };
+  targetBox?: FocusBox;
+  result?: { box: FocusBox; at: number };
 };
 export type Recording = {
   id: string;
@@ -135,6 +139,11 @@ export type ExportResult = {
   gif: string;
   poster: string;
   bytes: { mp4: number; gif: number };
+  cache?: {
+    hits: number;
+    misses: number;
+    scenes: { stepId: string; key: string; reused: boolean }[];
+  };
 };
 export type Job = {
   id: string;

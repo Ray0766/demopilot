@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-03",
+  "version": "0.2.0",
+  "machine": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.18.0",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285K"
+  },
+  "baseline": "a8d6ace77095dad86e19703ca3e9074044dafbc1",
+  "repeatability": {
+    "successes": 3,
+    "retries": 0,
+    "elapsedMs": [11384, 11397, 11402],
+    "changedAppSameRecipe": true
+  },
+  "preview": {
+    "samplesMs": [
+      115.12339999999676, 100.38120000000345, 99.61530000000494,
+      102.3127000000095, 114.13340000000608, 103.36380000000645,
+      114.06339999999909, 116.17559999998775
+    ],
+    "p95Ms": 116.17559999998775,
+    "captionDifference": 2.5557042331560282,
+    "frameDifference": 3.4488828125,
+    "originalCharacters": 160,
+    "ending": "完整结尾"
+  },
+  "editedPlayback": {
+    "invalidTrimRecovered": true,
+    "latestCaptionWins": true,
+    "failedFrameRetried": true,
+    "cutSkippedDuringPlayback": true,
+    "extendedHold": true,
+    "duration": 7.3,
+    "sampleCount": 251
+  },
+  "cache": {
+    "unchanged": {
+      "hits": 3,
+      "misses": 0
+    },
+    "oneCaption": {
+      "hits": 2,
+      "misses": 1
+    },
+    "damagedEntry": {
+      "hits": 2,
+      "misses": 1
+    }
+  },
+  "editing": {
+    "offlineRerender": true,
+    "sourceUnchanged": true,
+    "actionMismatchRejected": true,
+    "renderCancellation": "no partial export",
+    "templates": ["studio", "paper", "midnight"]
+  },
+  "exports": [
+    {
+      "template": "studio",
+      "duration": 11.033008,
+      "trimmedSeconds": 0.08,
+      "bytes": {
+        "mp4": 497166,
+        "gif": 2528344
+      }
+    },
+    {
+      "template": "paper",
+      "duration": 11.1,
+      "trimmedSeconds": 0.08,
+      "bytes": {
+        "mp4": 518551,
+        "gif": 2561537
+      }
+    },
+    {
+      "template": "midnight",
+      "duration": 10.833333,
+      "trimmedSeconds": 2.38,
+      "bytes": {
+        "mp4": 506008,
+        "gif": 2615851
+      }
+    }
+  ],
+  "recovery": {
+    "reload": true,
+    "unpublishedDraft": true,
+    "exportRestored": true,
+    "independentTakes": true,
+    "rerenderWithoutCapture": true,
+    "sourceHashesUnchanged": true,
+    "processRestart": true,
+    "connectionFailurePreservesDraft": true,
+    "incompleteDraft": true,
+    "missingExport": true,
+    "missingRecording": true,
+    "noSilentSubstitution": true,
+    "legacyMigration": true,
+    "pageErrors": []
+  },
+  "ui": {
+    "recordEditExport": true,
+    "videoPlayback": true,
+    "downloads": true,
+    "offlineEditNoRecapture": true,
+    "responsiveWidths": [390, 768, 1280, 1366, 1600],
+    "frameInspectorPreservesEdits": true,
+    "desktopPreviewAndScenesFit": true,
+    "helpKeyboardFocus": true,
+    "externalPlaybackControls": true,
+    "keyboardSeek": true,
+    "keyboardDisclosures": true,
+    "longCaptionKeyboardAccess": true,
+    "narrowTitleExpansion": true,
+    "bundledFontsLoaded": true,
+    "noExternalDesignRequests": true,
+    "pageErrors": []
+  },
+  "showcase": {
+    "duration": 31.466667,
+    "bytes": {
+      "mp4": 904214,
+      "gif": 3714390
+    },
+    "decoded": true,
+    "inspectedFrames": 8,
+    "realInnerTakes": 2
+  },
+  "package": {
+    "bytes": 354297,
+    "isolatedProductionInstall": true,
+    "cli": "0.2.0",
+    "doctor": true,
+    "realDemoExport": true
+  },
+  "limits": [
+    "Synthetic local workflow; no arbitrary-site reliability claim",
+    "Eight warmed edits exceed the 100 ms p95 research target",
+    "Selected-scene preview; native and encoded pixels differ",
+    "Recorded result rectangle, not continuous tracking",
+    "Windows receipt; public Linux output may differ"
+  ]
+}

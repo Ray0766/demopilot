@@ -1,6 +1,6 @@
 {
   "name": "@ray0766/demopilot",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Repeatable browser workflows. Release-ready demo videos.",
   "type": "module",
   "license": "MIT",

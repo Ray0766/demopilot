@@ -8,7 +8,11 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Recording, ExportResult } from "../shared/schema.js";
+import {
+  recipeSchema,
+  type Recording,
+  type ExportResult,
+} from "../shared/schema.js";
 
 export const validId = /^[a-f0-9-]{36}$/;
 export function itemPath(
@@ -34,12 +38,13 @@ export async function loadRecording(
   root: string,
   id: string,
 ): Promise<Recording> {
-  return JSON.parse(
+  const recording: Recording = JSON.parse(
     await readFile(
       path.join(itemPath(root, "recordings", id), "recording.json"),
       "utf8",
     ),
   );
+  return { ...recording, recipe: recipeSchema.parse(recording.recipe) };
 }
 export async function listRecordings(root: string): Promise<Recording[]> {
   const names = await readdir(path.join(root, "recordings")).catch(

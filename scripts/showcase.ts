@@ -46,7 +46,9 @@ const recipe = recipeSchema.parse({
       action: "fill",
       target: "role:textbox:Caption for scene 1",
       value: "Open a project form. 新建项目。",
-      caption: "Edit the caption while keeping the original footage.",
+      waitFor:
+        'canvas[data-ready="true"][data-caption="Open a project form. 新建项目。"]',
+      caption: "Edit the caption and see it before exporting.",
       holdMs: 2200,
       zoom: 1.2,
     },
@@ -61,6 +63,7 @@ const recipe = recipeSchema.parse({
       id: "style",
       action: "click",
       target: "text:Midnight",
+      waitFor: '.composition-preview canvas[data-ready="true"]',
       caption: "Choose a frame that suits your project.",
       holdMs: 1800,
     },
@@ -112,6 +115,9 @@ try {
     "Open a project form. 新建项目。",
   );
   assert.equal(takes[0].recipe.template, "midnight");
+  assert.ok(
+    takes.every((take) => take.scenes[0].result && take.scenes[2].result),
+  );
   await writeFile(
     path.join(root, "repeatability.json"),
     JSON.stringify(
@@ -120,6 +126,7 @@ try {
         stableStepIds: true,
         editedCaptionRetained: true,
         selectedFrameRetained: true,
+        resultPositionsCaptured: true,
       },
       null,
       2,

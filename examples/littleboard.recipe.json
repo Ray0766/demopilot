@@ -16,9 +16,9 @@
       "target": "role:button:New project",
       "value": "",
       "caption": "Open the new project form.",
-      "waitFor": "",
+      "waitFor": "#dialog",
       "holdMs": 2200,
-      "zoom": 1,
+      "zoom": 1.35,
       "trimStart": 0,
       "trimEnd": 0
     },
@@ -42,7 +42,7 @@
       "caption": "Create the project and find it on the board.",
       "waitFor": "text:Launch a little sooner",
       "holdMs": 2800,
-      "zoom": 1,
+      "zoom": 1.35,
       "trimStart": 0,
       "trimEnd": 0
     }

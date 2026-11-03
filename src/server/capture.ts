@@ -6,6 +6,7 @@ import {
   type Recipe,
   type Recording,
   type Scene,
+  type FocusBox,
 } from "../shared/schema.js";
 import { createItem, writeJson, removeItem } from "./store.js";
 import { pause, probe, throwIfAborted } from "./process.js";
@@ -32,6 +33,24 @@ export function locate(page: Page, target: string): Locator {
     return page.getByText(target.slice(5), { exact: true });
   if (target.startsWith("testid:")) return page.getByTestId(target.slice(7));
   return page.locator(target);
+}
+
+function visibleBox(
+  box: { x: number; y: number; width: number; height: number } | null,
+  viewport: Recipe["viewport"],
+): FocusBox | undefined {
+  if (!box) return;
+  const left = Math.max(0, box.x),
+    top = Math.max(0, box.y);
+  const right = Math.min(viewport.width, box.x + box.width),
+    bottom = Math.min(viewport.height, box.y + box.height);
+  if (right <= left || bottom <= top) return;
+  return {
+    x: left / viewport.width,
+    y: top / viewport.height,
+    width: (right - left) / viewport.width,
+    height: (bottom - top) / viewport.height,
+  };
 }
 
 export async function capture(
@@ -122,6 +141,7 @@ export async function capture(
           ? locate(page, step.target)
           : undefined;
       let focus = { x: 0.5, y: 0.5 };
+      let targetBox: FocusBox | undefined;
       if (target) {
         await target.waitFor({ state: "visible" });
         await target.scrollIntoViewIfNeeded();
@@ -135,6 +155,7 @@ export async function capture(
             );
         }
         const box = await target.boundingBox();
+        targetBox = visibleBox(box, recipe.viewport);
         if (box)
           focus = {
             x: Math.max(
@@ -193,8 +214,14 @@ export async function capture(
           break; // The explicit condition has already been awaited above.
       }
       const actionEnd = (performance.now() - sceneStarted) / 1000;
-      if (step.waitFor)
-        await locate(page, step.waitFor).waitFor({ state: "visible" });
+      let result: Scene["result"];
+      if (step.waitFor) {
+        const target = locate(page, step.waitFor);
+        await target.waitFor({ state: "visible" });
+        const box = visibleBox(await target.boundingBox(), recipe.viewport);
+        if (box)
+          result = { box, at: (performance.now() - sceneStarted) / 1000 };
+      }
       const readyAt = (performance.now() - sceneStarted) / 1000;
       // Always retain two seconds after readiness; editorial holds are applied in render.
       await pause(2000, signal);
@@ -214,6 +241,8 @@ export async function capture(
         readyAt,
         preWaitMs,
         focus,
+        targetBox,
+        result,
       });
     }
     throwIfAborted(signal);

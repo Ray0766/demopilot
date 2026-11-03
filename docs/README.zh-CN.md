@@ -18,9 +18,9 @@ npm run doctor
 npm start
 ```
 
-打开 `http://127.0.0.1:4310`。默认提供虚构数据的 Littleboard 示例，点 **Record demo** 录制三步流程；修改字幕、缩放、停留或首尾裁剪，再点 **Export MP4 + GIF**。预览播放的是实际导出文件。
+打开 `http://127.0.0.1:4310`。默认提供虚构数据的 Littleboard 示例，点 **Record demo** 录制三步流程；在 **Edit preview** 即时查看当前场景的字幕、镜头、停留和首尾裁剪，再点 **Export MP4 + GIF**。**Final cut** 播放实际导出文件。
 
-v0.1.4 采用明亮的品牌工作台：顶部是项目标题，底部 **The sequence** 横向排列步骤。选中场景后，在画面旁的 **Script** 编辑字幕；**Action & target** 展开操作目标，**Timing & zoom** 展开停留、缩放和裁剪，**Frame & export** 选择模板。展示字体和正文字体均本地打包。[设计参考与取舍](UI-COMPOSITION.md)
+v0.2.0 沿用明亮的品牌工作台：顶部是项目标题，底部 **The sequence** 横向排列步骤。选中场景后，在画面旁的 **Script** 编辑字幕；**Action & target** 展开操作目标，**Timing & zoom** 展开停留、缩放、镜头焦点和裁剪，**Frame & export** 选择模板。展示字体和正文字体均本地打包。[设计参考与取舍](UI-COMPOSITION.md)
 
 也可直接执行 `npm run demo`，自动启动示例并输出到 `output/demo/`。
 
@@ -31,6 +31,9 @@ v0.1.4 采用明亮的品牌工作台：顶部是项目标题，底部 **The seq
 - Playwright 自动等待、语义定位与真实 Chromium 录制。
 - 点击、填入、按键、滚动、悬停、选择、导航、等待可见目标。
 - Studio / Paper / Midnight 三种模板，字幕不盖住网页内容。
+- 字幕使用真实字体排版，预览和导出复用同一字幕画面；超出可读排版范围时明确报错，不静默截断。
+- 当前场景可即时预览；未变场景在导出时从校验过的缓存复用，改一句字幕只重做对应场景。最终拼接和 GIF 仍需生成。
+- 镜头可从操作位置平滑移向明确的 `waitFor` 结果，也可固定在操作目标或页面中央。旧录像没有结果位置时回退到操作目标。
 - MP4：1280 × 900，恒定 30 fps；GIF：800 px、12 fps、前 30 秒。
 - 长结果等待可剪短，成片会标记经过节奏编辑，不能据此推断真实响应速度。
 - 原始片段与导出保存在本机 `.demopilot/`；失败或取消的任务清理未完成结果。
@@ -57,6 +60,8 @@ node dist/server/cli.js render <recording-id> demo.recipe.json --output output/r
 ![项目演示](docs/demo.gif)
 ```
 
-[完整配方与排错](USAGE.md) · [当前验证记录](VALIDATION-v0.1.4.md) · [技术/设计决策](DECISIONS.md) · [贡献指南](../CONTRIBUTING.md)
+[完整配方与排错](USAGE.md) · [当前验证记录](VALIDATION-v0.2.0.md) · [技术/设计决策](DECISIONS.md) · [贡献指南](../CONTRIBUTING.md)
+
+即时预览覆盖选中的场景，整段成片仍需导出后审查；浏览器取帧、缩放与编码后像素可能稍有差异。结果镜头使用录制时观测到的位置，不持续追踪移动元素。缓存位于 `.demopilot/cache/scenes/`，每次导出后按最近使用清理至最多 128 项、512 MiB、七天；与源素材一样按本机私有媒体保管。
 
 源码采用 MIT。FFmpeg、浏览器与依赖保留各自许可。尚无与手工录屏或竞品的同任务耗时对照，不宣称生产效率提升百分比。

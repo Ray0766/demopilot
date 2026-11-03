@@ -10,7 +10,7 @@
 
 **DemoPilot is a local recording and editing studio for developers shipping browser apps.** Give it a URL and explicit steps. It operates Chromium, records the real page, and turns the footage into a release video and a short README animation. Save the recipe alongside your code and record it again when the app changes.
 
-**v0.1.4:** a bright release workbench with a project masthead, contextual scene editing and a horizontal sequence. Drafts recover across reloads. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
+**v0.2.0:** edit a scene's caption, timing and camera in a live preview; reuse unchanged scenes when exporting; follow the explicitly recorded result. Long captions fit through real font layout or report an actionable error instead of losing text. No account, model API, telemetry or cloud upload. Chromium and FFmpeg run on your machine. The website being recorded can still make its own network requests.
 
 ## Try it
 
@@ -29,7 +29,7 @@ npm start
 Open **http://127.0.0.1:4310**. The included Littleboard sample uses synthetic data and needs no login:
 
 1. Click **Record demo**. Watch three steps run in a fresh browser.
-2. Select a scene. Edit its caption in **Script**; open **Timing & zoom** for hold, zoom and trims. Choose a template in **Frame & export**.
+2. Select a scene. Edit its caption in **Script** and inspect **Edit preview** immediately. Open **Timing & zoom** for hold, trims and camera focus. Choose a template in **Frame & export**.
 3. Click **Export MP4 + GIF**. Preview the actual export and download both files.
 
 Want to skip the editor? `npm run demo` starts its own sample server, records the workflow, and writes `output/demo/demo.mp4` and `output/demo/demo.gif`.
@@ -41,14 +41,17 @@ On Linux, use `npx playwright install --with-deps chromium` if browser system li
 ![DemoPilot Studio after a real recording and export](docs/media/studio.png)
 
 - **Explicit steps:** click, fill, press, scroll, hover, select, navigate and wait for a visible target. Semantic targets and CSS selectors use Playwright's waiting and actionability checks.
-- **Editable footage:** captions, target-centered zoom, result holds and start/end trims can change without opening the website again. Original source clips stay intact.
+- **Editable footage:** captions, eased camera focus, result holds and start/end trims can change without opening the website again. Original source clips stay intact.
+- **Immediate scene preview:** captions use the same rendered frame as export; timing and crop share one composition plan. Play or scrub the selected scene before exporting.
+- **Incremental export:** content-checked scene caching reuses unchanged clips. Changing one caption rebuilds that scene; joining and GIF creation still run.
+- **Result-following camera:** a visible `waitFor` result supplies the destination rectangle. The camera eases from the action to that result, with target/center overrides and viewport bounds. Older takes without result positions keep action focus.
 - **Repeatable recipes:** stable step IDs connect the workflow to each captured scene. A changed action, URL or viewport requires a new recording, so old footage cannot silently represent a new workflow.
 - **Three visual styles:** Studio, Paper and Midnight. Captions sit outside the website; they do not cover its controls.
 - **Two outputs:** a 1280 × 900 H.264 MP4 at 30 fps, plus an 800 px GIF at 12 fps containing the first 30 seconds. GIFs use an optimized palette and loop.
 - **Honest pacing:** optional trimming removes the middle of long explicit result waits while retaining the action and result. The export labels edited pacing. These videos are presentations, not performance benchmarks.
 - **Local by design:** recipes and footage remain on disk. Failed or cancelled jobs remove their partial recording/export instead of showing a successful result.
 
-Source previews show the original scene. **Final cut** shows the most recent rendered MP4; pending edits are labeled until you export again. There is no simulated render or instantaneous preview claim.
+**Edit preview** shows the current selected scene's presentation without encoding a new video. **Recorded scene** shows its original footage. **Final cut** plays the most recent exported MP4; pending edits are labeled until you export again. Native preview decoding/scaling can differ slightly from encoded pixels; review Final cut before publishing.
 
 ## Use your own app
 
@@ -89,7 +92,7 @@ For a GitHub README, copy the GIF into your repository and add:
 ![Product demo](docs/demo.gif)
 ```
 
-[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Current validation](docs/VALIDATION-v0.1.4.md) · [UI references and design](docs/UI-COMPOSITION.md) · [Technical decisions](docs/DECISIONS.md)
+[Full recipe reference and CLI](docs/USAGE.md) · [Chinese guide](docs/README.zh-CN.md) · [Current validation](docs/VALIDATION-v0.2.0.md) · [UI references and design](docs/UI-COMPOSITION.md) · [Technical decisions](docs/DECISIONS.md)
 
 ## Boundaries of this release
 
