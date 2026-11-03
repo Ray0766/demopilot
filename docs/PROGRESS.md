@@ -14,4 +14,7 @@
 - UI record/edit/export/playback/download and 390/768/1600 px layouts verified. Screenshots and synthetic sample media are in docs/media; full local evidence is in test-results/e2e-1793673819517.
 - Produced a real 21.73 s DemoPilot-on-DemoPilot showcase (test-results/showcase-1793673780079); inspected scene frames, zoom bounds and CJK captions.
 - Built a 142 KB release package, installed only production dependencies into test-results/package-smoke and completed doctor + demo successfully. Production dependency audit: 0 known vulnerabilities.
-- Remaining: publish reviewed source/media, verify remote commit and CI, create GitHub Release and verify assets. Unverified limits are recorded in VALIDATION.md.
+- Published source through the authorized GitHub connector. Linux CI passed on Node 22 and 24; the release job reran the real flow, generated demo media, and published v0.1.0 with the package, showcase MP4 and README GIF.
+- Fetched and verified release commit `3dea89de3ab00099d22c64df432f21852c11af8f` and tag `v0.1.0`. Public media SHA-256 matches the release asset digests. Updated repository description, topics and release link.
+- Preserved the Windows-validated commits and media on local branch `local/validated-windows`; current `main` tracks the published repository. Source recordings and raw test evidence remain in ignored local directories.
+- Delivery complete. Unverified limits remain explicit in VALIDATION.md; no competitor or manual productivity advantage is claimed.
